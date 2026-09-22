@@ -2,23 +2,25 @@ import { Avatar, Button, Separator, Typography } from "@heroui/react";
 import HeaderBar from "../components/HeaderBar";
 import AvatarGroup from "../components/AvatarGroup";
 import { Calendar } from "@gravity-ui/icons";
-import { mockClub } from "../data/mockClubs";
+import { mockClubs } from "../data/mockClubs";
+import type { Club, User } from "../types";
+import { getClubMembers, getUserById, getUserFullName } from "../data/helper";
+import { useParams } from "react-router-dom";
 
-export interface Member {
-    id: number;
-    name: string;
-    image: string;
-}
-
-export interface Club {
-    id: number;
-    name: string;
-    description: string;
-    schedule: string;
-    leader: string;
-}
 
 function ClubPage() {
+    const { id } = useParams<{ id: string }>()
+
+    const club: Club | undefined = mockClubs.find((c) => c.id === Number(id))
+    if (!club) {
+        return <div>Кружок  не найден</div>
+    }
+
+    const leader: User | undefined = getUserById(club.leaderId)
+    if (!leader) {
+        return <div>Руководитель не найден</div>
+    }
+
     return (
         <main className="bg-background min-h-screen px-5 py-8 flex flex-col items-center gap-5">
 
@@ -28,18 +30,18 @@ function ClubPage() {
 
             <div className="flex gap-4 w-full max-w-5xl p-4 mx-auto rounded-xl items-start">
                 <Avatar size="lg" className="size-24 rounded-4xl sm:size-36 sm:rounded-[calc(var(--radius-2xl)*3)] lg:size-48 lg:rounded-[calc(var(--radius-2xl)*4)]">
-                    <Avatar.Fallback>ЛК</Avatar.Fallback>
-                    <Avatar.Image src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg" />
+                    <Avatar.Image alt={club.name} src={club.imageUrl} />
+                    <Avatar.Fallback>{club.name.slice(0, 2)}</Avatar.Fallback>
                 </Avatar>
 
                 <div className="flex flex-col gap-6 flex-1">
                     <div className="flex items-center gap-4">
-                        <Typography type="h1">{mockClub.name}</Typography>
-                        <AvatarGroup />
+                        <Typography type="h1">{club.name}</Typography>
+                        <AvatarGroup users={getClubMembers(club)} />
                     </div>
 
                     <Typography type="body" className="text-default-500">
-                        {mockClub.description}
+                        {club.description}
                     </Typography>
 
                     <Separator />
@@ -47,12 +49,12 @@ function ClubPage() {
                     <div className="flex w-full items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Avatar className="size-10">
-                                <Avatar.Image alt="Руководитель" src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg" />
-                                <Avatar.Fallback className="text-xs">АВ</Avatar.Fallback>
+                                <Avatar.Fallback className="text-xs">!!</Avatar.Fallback>
+                                <Avatar.Image alt="Руководитель" src={leader.avatarUrl} />
                             </Avatar>
                             <div className="flex flex-col">
                                 <span className="text-xs text-default-400">Руководитель</span>
-                                <span className="font-medium">{mockClub.leader}</span>
+                                <span className="font-medium">{getUserFullName(leader)}</span>
                             </div>
                         </div>
 
@@ -63,7 +65,7 @@ function ClubPage() {
                         <Typography type="h3">Расписание</Typography>
                         <div className="flex items-start gap-2 p-3 rounded-xl border border-default-100">
                             <Calendar className="size-4 text-default-400 mt-0.5 shrink-0" />
-                            <span className="text-default-600 whitespace-pre-line">{mockClub.schedule}</span>
+                            <span className="text-default-600 whitespace-pre-line">{club.schedule}</span>
                         </div>
                     </div>
                 </div>

@@ -1,23 +1,30 @@
 import { Avatar } from "@heroui/react"
-import { mockMembers } from "../data/mockClubMembers"
+import type { User } from "../types";
+import { getUserAvatarFallback, getUserFullName } from "../data/helper";
 
-function AvatarGroup() {
+export interface AvatarGroupProps {
+    users: User[];
+}
+
+function AvatarGroup({ users }: AvatarGroupProps) {
+    const NUM_USERS = 3
+
     return (
         <div className="flex -space-x-2">
-            {mockMembers.slice(0, 3).map((user) => (
+            {users.slice(0, NUM_USERS).map((user) => (
                 <Avatar key={user.id} className="ring-2 ring-background">
-                    <Avatar.Image alt={user.name} src={user.image} />
-                    <Avatar.Fallback>
-                    {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </Avatar.Fallback>
+                    <Avatar.Image alt={getUserFullName(user)} src={user.avatarUrl} />
+                    <Avatar.Fallback>{getUserAvatarFallback(user)}</Avatar.Fallback>
                 </Avatar>
             ))}
-            <Avatar className="ring-2 ring-background">
-                <Avatar.Fallback className="text-xs">+{mockMembers.length - 3}</Avatar.Fallback>
-            </Avatar>
+
+            {users.length - NUM_USERS > 0 ? (
+                <Avatar className="ring-2 ring-background">
+                    <Avatar.Fallback className="text-xs">+{users.length - 3}</Avatar.Fallback>
+                </Avatar>
+            ) : <></>}
+
+
         </div>
     )
 }

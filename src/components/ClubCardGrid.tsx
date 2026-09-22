@@ -1,18 +1,19 @@
 import { Typography } from "@heroui/react";
-import ClubCard, { type ClubCardProps } from "./ClubCard";
+import ClubCard from "./ClubCard";
+import type { Club } from "../types";
 
 interface ClubCardGridProps {
     title: string;
-    cards: ClubCardProps[];
+    clubs: Club[];
 }
 
-function ClubCardGrid({ title, cards }: ClubCardGridProps) {
+function ClubCardGrid({ title, clubs }: ClubCardGridProps) {
     return (
         <>
             <Typography type="h2">{title}</Typography>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {cards.map((card) => (
-                    <ClubCard key={card.name} name={card.name} />
+                {clubs.map((club) => (
+                    <ClubCard key={club.id} club={club} />
                 ))}
             </div>
         </>

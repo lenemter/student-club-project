@@ -1,14 +1,6 @@
+import type { Notification } from "../types"
 import { Bell, CircleCheck, CircleInfo, TriangleExclamation } from "@gravity-ui/icons"
 import { Button, Dropdown, Label } from "@heroui/react"
-
-export interface Notification {
-    id: string;
-    title: string;
-    description: string;
-    time: string;
-    isRead: boolean;
-    type: "success" | "info" | "warning";
-}
 
 const notificationIcons = {
     success: { icon: CircleCheck, color: "text-green-500" },
@@ -55,7 +47,7 @@ function NotificationButton({ notifications }: NotificationButtonProps) {
                                                 {notification.description}
                                             </span>
                                             <span className="text-xs text-default-300 text-muted">
-                                                {notification.time}
+                                                {notification.createdAt}
                                             </span>
                                         </div>
                                     </Dropdown.Item>

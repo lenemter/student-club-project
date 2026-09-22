@@ -1,19 +1,21 @@
-import type { Notification } from "../components/NotificationButton";
+import type { Notification } from "../types";
 
 export const mockNotifications: Notification[] = [
     {
-        id: "1",
+        id: 1,
+        userId: 1,
         title: "Заявка одобрена",
         description: "Вы приняты в кружок «Теннис»",
-        time: "5 минут назад",
+        createdAt: "5 минут назад",
         isRead: false,
         type: "success",
     },
     {
-        id: "2",
+        id: 2,
+        userId: 1,
         title: "Заявка одобрена",
         description: "Вы приняты в кружок «Баскетбол»",
-        time: "28 минут назад",
+        createdAt: "28 минут назад",
         isRead: false,
         type: "success",
     },

@@ -1,6 +1,8 @@
 import { ArrowRightFromSquare, ChevronDown, Gear } from "@gravity-ui/icons"
 import { Dropdown, Button, Avatar, Typography, Label, Separator } from "@heroui/react"
 import { useNavigate } from "react-router-dom";
+import { currentUser } from "../data/mockUsers";
+import { getUserAvatarFallback, getUserFullName } from "../data/helper";
 
 
 function ProfileButton() {
@@ -11,10 +13,10 @@ function ProfileButton() {
             <Button aria-label="Профиль" size="lg" variant="outline" className="px-2 py-6">
                 <div className="flex gap-2 items-center">
                     <Avatar>
-                        <Avatar.Image src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg" />
-                        <Avatar.Fallback>КЛ</Avatar.Fallback>
+                        <Avatar.Image alt={getUserFullName(currentUser)} src={currentUser.avatarUrl} />
+                        <Avatar.Fallback>{getUserAvatarFallback(currentUser)}</Avatar.Fallback>
                     </Avatar>
-                    <Typography>Леонид</Typography>
+                    <Typography>{currentUser.firstName}</Typography>
                     <ChevronDown />
                 </div>
             </Button>
@@ -23,22 +25,19 @@ function ProfileButton() {
                 <div className="px-3 pt-3 pb-1">
                     <div className="flex items-center gap-2">
                         <Avatar size="sm">
-                            <Avatar.Image
-                                alt="Jane"
-                                src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg"
-                            />
-                            <Avatar.Fallback>ЛК</Avatar.Fallback>
+                            <Avatar.Image alt={getUserFullName(currentUser)} src={currentUser.avatarUrl} />
+                            <Avatar.Fallback>{getUserAvatarFallback(currentUser)}</Avatar.Fallback>
                         </Avatar>
                         <div className="flex flex-col gap-0">
-                            <p className="text-sm leading-5 font-medium">Леонид Копылов</p>
-                            <p className="text-xs leading-none text-muted">lenemter@gmail.com</p>
+                            <p className="text-sm leading-5 font-medium">{getUserFullName(currentUser)}</p>
+                            <p className="text-xs leading-none text-muted">{currentUser.email}</p>
                         </div>
                     </div>
                 </div>
 
                 <Dropdown.Menu
                     onAction={(key) => {
-                        if (key =="profile") navigate ("/profile")
+                        if (key =="profile") navigate (`/profile/${currentUser.id}`)
                         if (key == "settings") navigate("/settings")
                         if (key == "log-out") navigate("/login")
                     }}

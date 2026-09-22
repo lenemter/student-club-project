@@ -1,5 +1,5 @@
-import { Bell, Check, CircleCheck, CircleInfo, Persons, Rocket, SquarePlus, TriangleExclamation } from "@gravity-ui/icons"
-import { Button, Dropdown, FieldError, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
+import { Check, Persons, SquarePlus } from "@gravity-ui/icons"
+import { Button, FieldError, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
 import { Form } from "react-router-dom"
 
 

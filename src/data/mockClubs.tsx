@@ -1,27 +1,103 @@
-import type { ClubCardProps } from "../components/ClubCard";
-import type { Club } from "../pages/ClubPage";
+import type { Club } from "../types";
 
-export const mockJoinedCards: ClubCardProps[] = [
-    { name: "Баскетбол" },
-    { name: "Настольный теннис" },
-];
-
-export const mockOtherCards: ClubCardProps[] = [
-    { name: "Теннис" },
-    { name: "Футбол" },
-    { name: "Хоккей" },
-    { name: "Мини-футбол" },
-    { name: "Мини-футбол" },
-    { name: "Мини-футбол" },
-    { name: "Мини-футбол" },
-    { name: "Мини-футбол" },
-    { name: "Мини-футбол" },
-];
-
-export const mockClub: Club = {
-    id: 1,
-    name: "Теннис",
-    description: "Теннис (англ. tennis), большой теннис или лаун-теннис — вид спорта, в котором соперничают либо два игрока («одиночная игра»), либо две команды, состоящие из двух игроков («парная игра»).",
-    schedule: "Вторник 15:00, четверг 16:00.",
-    leader: "Абоба Викторович",
-};
+export const mockClubs: Club[] = [
+    {
+        id: 1,
+        name: "Баскетбол",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 1,
+    },
+    {
+        id: 2,
+        name: "Настольный теннис",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 3,
+        name: "Теннис",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 4,
+        name: "Футбол",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 5,
+        name: "Хоккей",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 6,
+        name: "Мини-футбол",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 7,
+        name: "Мини-футбол 2",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 8,
+        name: "Мини-футбол 3",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 9,
+        name: "Мини-футбол 4",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 10,
+        name: "Мини-футбол 5",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+    {
+        id: 11,
+        name: "Мини-футбол 6",
+        description: "",
+        imageUrl:
+            "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+        schedule: "",
+        leaderId: 2,
+    },
+]

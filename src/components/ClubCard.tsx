@@ -1,37 +1,55 @@
 import { Avatar, Button, Card } from "@heroui/react"
 import { useNavigate } from "react-router-dom";
+import type { Club, User } from "../types";
+import { getClubMembers, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
+import { currentUser, fallbackUser } from "../data/mockUsers";
 
-export interface ClubCardProps {
-    name: string;
+interface ClubCardProps {
+    club: Club;
 }
 
-function ClubCard({ name }: ClubCardProps) {
+function getMemberCountText(n: number): string {
+    if (n <= 0) {
+        return "Нет участников"
+    }
+
+    if (n % 10 === 1 && n % 100 !== 11) {
+        return `${n} участник`
+    }
+
+    if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20)) {
+        return `${n} участника`
+    }
+
+    return `${n} участников`
+}
+
+function ClubCard({ club }: ClubCardProps) {
     const navigate = useNavigate()
 
+    const leader: User = getUserById(club.leaderId) ?? fallbackUser
+
     return (
-        <Button variant="ghost" onPress={() => navigate("/club")} className="w-full h-auto p-0 block text-left">
+        <Button variant="ghost" onPress={() => navigate(`/club/${club.id}`)} className="w-full h-auto p-0 block text-left">
             <Card>
                 <img
-                    alt={name}
+                    alt={club.name}
                     className="pointer-events-none aspect-square w-14 rounded-2xl object-cover select-none"
                     loading="lazy"
-                    src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg"
+                    src={club.imageUrl}
                 />
 
                 <Card.Header>
-                    <Card.Title>{name}</Card.Title>
-                    <Card.Description>148 участников</Card.Description>
+                    <Card.Title>{club.name}</Card.Title>
+                    <Card.Description>{getMemberCountText(getClubMembers(club).length)}</Card.Description>
                 </Card.Header>
 
                 <Card.Footer className="flex gap-2">
-                    <Avatar aria-label="" className="size-5">
-                        <Avatar.Image
-                            alt=""
-                            src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/red.jpg"
-                        />
-                        <Avatar.Fallback className="text-xs">АВ</Avatar.Fallback>
+                    <Avatar className="size-5">
+                        <Avatar.Image alt={getUserFullName(currentUser)} src={leader.avatarUrl} />
+                        <Avatar.Fallback className="text-xs">{getUserAvatarFallback(leader)}</Avatar.Fallback>
                     </Avatar>
-                    <span className="text-xs">Абоба Викторович</span>
+                    <span className="text-xs">{getUserFullName(leader)}</span>
                 </Card.Footer>
             </Card>
         </Button>

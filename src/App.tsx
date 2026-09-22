@@ -9,9 +9,8 @@ const router = createBrowserRouter([
     { path: "/", element: <HomePage /> },
     { path: "/login", element: <LoginPage /> },
     { path: "/signup", element: <SignUpPage /> },
-    { path: "/profile", element: <ProfilePage /> },
-    { path: "/another-profile", element: <ProfilePage /> },
-    { path: "/club", element: <ClubPage /> },
+    { path: "/profile/:id", element: <ProfilePage /> },
+    { path: "/club/:id", element: <ClubPage /> },
 ])
 
 function App() {
