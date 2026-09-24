@@ -1,6 +1,7 @@
 import { Button, Card, FieldError, Form, Input, Label, TextField, Typography } from "@heroui/react"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
+import PasswordField from "../components/PasswordField"
 
 function LoginPage() {
     const navigate = useNavigate()
@@ -30,11 +31,7 @@ function LoginPage() {
                         <FieldError />
                     </TextField>
 
-                    <TextField name="password" variant="secondary" type="password" autoComplete="current-password" isRequired onChange={(str) => setPassword(str)}>
-                        <Label>Пароль</Label>
-                        <Input placeholder="••••••••" />
-                        <FieldError />
-                    </TextField>
+                    <PasswordField label="Пароль" autoComplete="current-password" isRequired onChange={(str) => setPassword(str)}/>
 
                     <Button type="submit" size="lg" className="mt-2">
                         Войти

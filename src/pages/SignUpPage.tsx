@@ -1,6 +1,7 @@
 import { Button, Card, FieldError, Form, Input, Label, TextField, Typography } from "@heroui/react"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
+import PasswordField from "../components/PasswordField"
 
 function SignUpPage() {
     const navigate = useNavigate()
@@ -51,25 +52,15 @@ function SignUpPage() {
                         <FieldError />
                     </TextField>
 
-                    <TextField name="password" variant="secondary" type="password" autoComplete="new-password" isRequired onChange={(str) => setPassword(str)}>
-                        <Label>Пароль</Label>
-                        <Input placeholder="••••••••" />
-                        <FieldError />
-                    </TextField>
+                    <PasswordField label="Пароль" autoComplete="new-password" isRequired onChange={(str) => setPassword(str)} />
 
-                    <TextField
-                        name="confirmPassword"
-                        variant="secondary"
-                        type="password"
+                    <PasswordField
+                        label="Подтвердите пароль"
                         autoComplete="new-password"
                         isRequired
                         onChange={(str) => setConfirmPassword(str)}
-                        validate={(value) => (value !== password ? "Пароли не совпадают." : null)}
-                    >
-                        <Label>Подтвердите пароль</Label>
-                        <Input placeholder="••••••••" />
-                        <FieldError />
-                    </TextField>
+                        validate={(value) => (value !== password ? "Пароли не совпадают." : null)} 
+                    />
 
                     <Button type="submit" size="lg" className="mt-2">
                         Зарегистрироваться
