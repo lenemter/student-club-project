@@ -1,6 +1,5 @@
 import { Check, Persons } from "@gravity-ui/icons"
-import { Button, FieldError, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
-import { Form } from "react-router-dom"
+import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
 
 
 function NewClubButton() {
@@ -8,7 +7,7 @@ function NewClubButton() {
         <Modal>
             <Button variant="primary">
                 <span className="hidden sm:inline">
-                    Открыть свой кружок
+                    Создать кружок
                 </span>
                 <IconPlus />
             </Button>
