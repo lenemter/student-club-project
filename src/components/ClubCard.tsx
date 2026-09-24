@@ -30,7 +30,7 @@ function ClubCard({ club }: ClubCardProps) {
     const leader: User = getUserById(club.leaderId) ?? fallbackUser
 
     return (
-        <Button variant="ghost" onPress={() => navigate(`/club/${club.id}`)} className="w-full h-auto p-0 block text-left">
+        <Button variant="ghost" onPress={() => navigate(`/club/${club.id}`)} className="w-full h-auto p-0 block text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg">
             <Card>
                 <img
                     alt={club.name}
