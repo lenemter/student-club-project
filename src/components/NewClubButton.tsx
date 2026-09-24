@@ -26,15 +26,24 @@ function NewClubButton() {
                                 Вы станете руководителем и сможете принимать заявки на вступление
                             </p>
                         </Modal.Header>
-                        <Modal.Body className="p-6">
-                            <Form className="flex flex-col gap-4" onSubmit={() => { }}>
+                        <Modal.Body>
+                            <Form className="flex flex-col gap-2" onSubmit={() => { }}>
                                 <TextField name="name" variant="secondary" isRequired>
                                     <Label>Название</Label>
                                     <Input placeholder="Классный кружок" />
                                     <FieldError />
                                 </TextField>
 
-                                <TextArea fullWidth placeholder="Он классный, потому что проходит в 610." name="description" variant="secondary" />
+                                <div>
+                                    <Label htmlFor="description">Название</Label>
+                                    <TextArea
+                                        fullWidth
+                                        id="description"
+                                        placeholder="Он классный, потому что проходит в 610."
+                                        name="description"
+                                        variant="secondary"
+                                    />
+                                </div>
 
                                 <TextField name="schedule" variant="secondary" isRequired>
                                     <Label>Расписание</Label>
@@ -42,7 +51,7 @@ function NewClubButton() {
                                     <FieldError />
                                 </TextField>
 
-                                <Button type="submit">
+                                <Button type="submit" className="mt-4">
                                     <Check />
                                     Создать
                                 </Button>

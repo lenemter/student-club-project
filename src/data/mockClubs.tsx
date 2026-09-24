@@ -4,7 +4,7 @@ export const mockClubs: Club[] = [
     {
         id: 1,
         name: "Баскетбол",
-        description: "",
+        description: "Баскетболим",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
         schedule: "",
@@ -13,7 +13,7 @@ export const mockClubs: Club[] = [
     {
         id: 2,
         name: "Настольный теннис",
-        description: "",
+        description: "Теннисим",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
         schedule: "",

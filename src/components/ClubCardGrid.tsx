@@ -9,7 +9,7 @@ interface ClubCardGridProps {
 
 function ClubCardGrid({ title, clubs }: ClubCardGridProps) {
     return (
-        <>
+        <div>
             <Typography type="h2">{title}</Typography>
             {clubs.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -22,7 +22,7 @@ function ClubCardGrid({ title, clubs }: ClubCardGridProps) {
                     <Typography type="h3">Нет курсов</Typography>
                 </div>
             )}
-        </>
+        </div>
     )
 }
 

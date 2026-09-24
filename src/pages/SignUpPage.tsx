@@ -23,7 +23,7 @@ function SignUpPage() {
     }
 
     return (
-        <main className="bg-background min-h-screen flex items-center justify-center px-3">
+        <main className="bg-background min-h-screen flex items-center justify-center px-4">
             <Card variant="default" className="p-10 w-full max-w-md">
                 <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-1 mb-2">
