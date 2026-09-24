@@ -21,7 +21,7 @@ function NotificationButton({ notifications }: NotificationButtonProps) {
                 <Badge.Anchor>
                     <Bell />
                     {unreadCount > 0 && (
-                        <Badge color="danger" size="sm" className="translate-x-1/4 -translate-y-1/4"></Badge>
+                        <Badge color="danger" size="sm" className="translate-x-1/5 -translate-y-1/5"></Badge>
                     )}
                 </Badge.Anchor>
             </Button>
@@ -45,13 +45,13 @@ function NotificationButton({ notifications }: NotificationButtonProps) {
                                     >
                                         <Icon className={`size-5 mt-0.5 shrink-0 ${color}`} />
                                         <div className="flex flex-col gap-1">
-                                            <Label className={notification.isRead ? "text-default-400" : "font-semibold"}>
+                                            <Label className="font-semibold">
                                                 {notification.title}
                                             </Label>
-                                            <span className="text-xs text-default-400">
+                                            <span className="text-xs">
                                                 {notification.description}
                                             </span>
-                                            <span className="text-xs text-default-300 text-muted">
+                                            <span className="text-xs text-muted">
                                                 {notification.createdAt}
                                             </span>
                                         </div>

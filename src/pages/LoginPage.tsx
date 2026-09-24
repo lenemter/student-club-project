@@ -20,7 +20,7 @@ function LoginPage() {
                 <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-1 mb-2">
                         <Typography type="h2">Вход</Typography>
-                        <Typography type="body" className="text-default-500">
+                        <Typography type="body">
                             Войдите, чтобы управлять своими кружками
                         </Typography>
                     </div>

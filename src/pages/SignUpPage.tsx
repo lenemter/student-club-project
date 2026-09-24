@@ -9,15 +9,9 @@ function SignUpPage() {
     const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
-
-        if (password !== confirmPassword) {
-            console.log("Пароли не совпадают")
-            return
-        }
 
         console.log("Регистрация:", { firstName, lastName, email, password })
         navigate("/")
@@ -29,7 +23,7 @@ function SignUpPage() {
                 <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-1 mb-2">
                         <Typography type="h2">Регистрация</Typography>
-                        <Typography type="body" className="text-default-500">
+                        <Typography type="body">
                             Создайте аккаунт, чтобы вступать в кружки и следить за расписанием
                         </Typography>
                     </div>
@@ -58,7 +52,6 @@ function SignUpPage() {
                         label="Подтвердите пароль"
                         autoComplete="new-password"
                         isRequired
-                        onChange={(str) => setConfirmPassword(str)}
                         validate={(value) => (value !== password ? "Пароли не совпадают." : null)} 
                     />
 

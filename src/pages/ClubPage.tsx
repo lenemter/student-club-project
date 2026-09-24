@@ -51,7 +51,7 @@ function ClubPage() {
                                     <Avatar.Image alt={`Руководитель ${getUserFullName(leader)}`} src={leader.avatarUrl} />
                                 </Avatar>
                                 <div className="flex flex-col">
-                                    <span className="text-xs text-default-400">Руководитель</span>
+                                    <span className="text-xs">Руководитель</span>
                                     <span className="font-medium">{getUserFullName(leader)}</span>
                                 </div>
                             </div>
@@ -62,8 +62,8 @@ function ClubPage() {
                         <div className="flex flex-col gap-2">
                             <Typography type="h3">Расписание</Typography>
                             <div className="flex items-start gap-2 p-3 rounded-xl border border-default-100">
-                                <Calendar className="size-4 text-default-400 mt-0.5 shrink-0" />
-                                <span className="text-default-600 whitespace-pre-line">{club.schedule}</span>
+                                <Calendar className="size-4 mt-0.5 shrink-0" />
+                                <span className="whitespace-pre-line">{club.schedule}</span>
                             </div>
                         </div>
                     </div>
