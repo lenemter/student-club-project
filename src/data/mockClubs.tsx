@@ -7,7 +7,7 @@ export const mockClubs: Club[] = [
         description: "Баскетболим",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 1,
     },
     {
@@ -16,88 +16,88 @@ export const mockClubs: Club[] = [
         description: "Теннисим",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 3,
         name: "Теннис",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 4,
         name: "Футбол",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 5,
         name: "Хоккей",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 6,
         name: "Мини-футбол",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 7,
         name: "Мини-футбол 2",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 8,
         name: "Мини-футбол 3",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 9,
         name: "Мини-футбол 4",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 10,
         name: "Мини-футбол 5",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
     {
         id: 11,
         name: "Мини-футбол 6",
-        description: "",
+        description: "Пока что нет описания",
         imageUrl:
             "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-        schedule: "",
+        schedule: "Понедельник, четверг в 17:00",
         leaderId: 2,
     },
 ]
