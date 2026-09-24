@@ -1,13 +1,14 @@
-import { Check, Persons, SquarePlus } from "@gravity-ui/icons"
-import { Button, FieldError, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
+import { Check, Persons } from "@gravity-ui/icons"
+import { Button, FieldError, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
 import { Form } from "react-router-dom"
 
 
 function NewClubButton() {
     return (
         <Modal>
-            <Button isIconOnly variant="ghost">
-                <SquarePlus />
+            <Button variant="primary">
+                Открыть свой кружок
+                <IconPlus />
             </Button>
 
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>

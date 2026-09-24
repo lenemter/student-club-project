@@ -3,13 +3,17 @@ import ClubCardGrid from "../components/ClubCardGrid";
 import { getUserClubs, getJoinableClubs } from "../data/helper";
 import HeaderBar from "../components/HeaderBar";
 import { currentUser } from "../data/mockUsers";
+import NewClubButton from "../components/NewClubButton";
 
 function HomePage() {
     return (
         <main className="bg-background min-h-screen px-5 py-8 flex flex-col items-center gap-5">
             <div className="flex justify-between w-full max-w-5xl p-4 mx-auto rounded-xl">
                 <Typography type="h1">Привет, {currentUser.firstName} 👋</Typography>
-                <HeaderBar />
+                <div className="flex items-center gap-2">
+                    <NewClubButton />
+                    <HeaderBar />
+                </div>
             </div>
 
             <div className="flex flex-col gap-2 w-full max-w-5xl p-4 mx-auto rounded-xl">
