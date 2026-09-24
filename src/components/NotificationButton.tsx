@@ -1,11 +1,11 @@
 import type { Notification } from "../types"
 import { Bell, CircleCheck, CircleInfo, TriangleExclamation } from "@gravity-ui/icons"
-import { Button, Dropdown, Label } from "@heroui/react"
+import { Badge, Button, Dropdown, Label } from "@heroui/react"
 
 const notificationIcons = {
-    success: { icon: CircleCheck, color: "text-green-500" },
-    info: { icon: CircleInfo, color: "text-blue-500" },
-    warning: { icon: TriangleExclamation, color: "text-amber-500" },
+    success: { icon: CircleCheck, color: "text-success" },
+    info: { icon: CircleInfo, color: "text-accent" },
+    warning: { icon: TriangleExclamation, color: "text-danger" },
 }
 
 interface NotificationButtonProps {
@@ -13,12 +13,15 @@ interface NotificationButtonProps {
 }
 
 function NotificationButton({ notifications }: NotificationButtonProps) {
-    // const unreadCount = notifications.filter((n) => !n.isRead).length
+    const unreadCount = notifications.filter((n) => !n.isRead).length
 
     return (
         <Dropdown>
             <Button isIconOnly variant="ghost">
-                <Bell />
+                <Badge.Anchor>
+                    <Bell />
+                    <Badge color="danger" placement="bottom-right" size="sm">{unreadCount}</Badge>
+                </Badge.Anchor>
             </Button>
 
             <Dropdown.Popover className="max-w-72.5" placement="bottom">
