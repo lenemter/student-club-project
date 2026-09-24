@@ -24,13 +24,13 @@ function LoginPage() {
                         </Typography>
                     </div>
 
-                    <TextField name="name" variant="secondary" type="email" isRequired onChange={(str) => setEmail(str)}>
+                    <TextField name="email" variant="secondary" type="email" autoComplete="email" isRequired onChange={(str) => setEmail(str)}>
                         <Label>Email</Label>
                         <Input placeholder="example@example.com" />
                         <FieldError />
                     </TextField>
 
-                    <TextField name="password" variant="secondary" type="password" isRequired onChange={(str) => setPassword(str)}>
+                    <TextField name="password" variant="secondary" type="password" autoComplete="current-password" isRequired onChange={(str) => setPassword(str)}>
                         <Label>Пароль</Label>
                         <Input placeholder="••••••••" />
                         <FieldError />
