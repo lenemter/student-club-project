@@ -68,7 +68,7 @@ function ProfileButton() {
                         <Dropdown.Item
                             className="flex flex-col items-start gap-1"
                             id="log-out"
-                            textValue="Squash and merge"
+                            textValue="Выйти"
                             variant="danger"
                         >
                             <div className="flex w-full items-center justify-between gap-2">

@@ -52,7 +52,8 @@
 
   /* Font Family */
   /* Make sure to load Inter font in your app */
-  --font-sans: var(--font-inter);
+  /* --font-sans: var(--font-inter); */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 .dark,

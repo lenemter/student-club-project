@@ -4,7 +4,7 @@ import AvatarGroup from "../components/AvatarGroup";
 import { Calendar } from "@gravity-ui/icons";
 import { mockClubs } from "../data/mockClubs";
 import type { Club, User } from "../types";
-import { getClubMembers, getUserById, getUserFullName } from "../data/helper";
+import { getClubMembers, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
 import { useParams } from "react-router-dom";
 
 
@@ -22,8 +22,7 @@ function ClubPage() {
     }
 
     return (
-        <main className="bg-background min-h-screen px-5 py-8 flex flex-col items-center gap-5">
-
+        <main className="bg-background min-h-screen px-3 py-8 flex flex-col items-center gap-5">
             <div className="flex justify-end w-full max-w-5xl p-4 mx-auto rounded-xl">
                 <HeaderBar />
             </div>
@@ -31,7 +30,7 @@ function ClubPage() {
             <div className="flex gap-4 w-full max-w-5xl p-4 mx-auto rounded-xl items-start">
                 <Avatar size="lg" className="size-24 rounded-4xl sm:size-36 sm:rounded-[calc(var(--radius-2xl)*3)] lg:size-48 lg:rounded-[calc(var(--radius-2xl)*4)]">
                     <Avatar.Image alt={club.name} src={club.imageUrl} />
-                    <Avatar.Fallback>{club.name.slice(0, 2)}</Avatar.Fallback>
+                    <Avatar.Fallback>{club.name.slice(0, 1)}</Avatar.Fallback>
                 </Avatar>
 
                 <div className="flex flex-col gap-6 flex-1">
@@ -49,8 +48,8 @@ function ClubPage() {
                     <div className="flex w-full items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Avatar className="size-10">
-                                <Avatar.Fallback className="text-xs">!!</Avatar.Fallback>
-                                <Avatar.Image alt="Руководитель" src={leader.avatarUrl} />
+                                <Avatar.Fallback className="text-xs">{getUserAvatarFallback(leader)}</Avatar.Fallback>
+                                <Avatar.Image alt={`Руководитель ${getUserFullName(leader)}`} src={leader.avatarUrl} />
                             </Avatar>
                             <div className="flex flex-col">
                                 <span className="text-xs text-default-400">Руководитель</span>
@@ -70,7 +69,6 @@ function ClubPage() {
                     </div>
                 </div>
             </div>
-
         </main>
     );
 }

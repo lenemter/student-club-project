@@ -7,7 +7,9 @@ function NewClubButton() {
     return (
         <Modal>
             <Button variant="primary">
-                Открыть свой кружок
+                <span className="hidden sm:inline">
+                    Открыть свой кружок
+                </span>
                 <IconPlus />
             </Button>
 
@@ -21,11 +23,11 @@ function NewClubButton() {
                             </Modal.Icon>
                             <Modal.Heading>Создать кружок</Modal.Heading>
                             <p className="mt-1.5 text-sm leading-5 text-muted">
-                                Что-то сюда мб??
+                                Вы станете руководителем и сможете принимать заявки на вступление
                             </p>
                         </Modal.Header>
                         <Modal.Body className="p-6">
-                            <Form className="flex flex-col gap-4" onSubmit={() => {}}>
+                            <Form className="flex flex-col gap-4" onSubmit={() => { }}>
                                 <TextField name="name" variant="secondary" isRequired>
                                     <Label>Название</Label>
                                     <Input placeholder="Классный кружок" />

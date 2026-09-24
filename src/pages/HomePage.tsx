@@ -7,20 +7,20 @@ import NewClubButton from "../components/NewClubButton";
 
 function HomePage() {
     return (
-        <main className="bg-background min-h-screen px-5 py-8 flex flex-col items-center gap-5">
-            <div className="flex justify-between w-full max-w-5xl p-4 mx-auto rounded-xl">
+        <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center gap-5">
+            <div className="flex flex-col gap-3 w-full max-w-5xl mx-auto sm:flex-row sm:items-center sm:justify-between">
                 <Typography type="h1">Привет, {currentUser.firstName} 👋</Typography>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                     <NewClubButton />
                     <HeaderBar />
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2 w-full max-w-5xl p-4 mx-auto rounded-xl">
+            <div className="flex flex-col gap-2 w-full max-w-5xl mx-auto rounded-xl">
                 <ClubCardGrid title="Мои кружки" clubs={getUserClubs(currentUser.id)} />
             </div>
 
-            <div className="flex flex-col gap-2 w-full max-w-5xl mx-auto p-4 rounded-xl">
+            <div className="flex flex-col gap-2 w-full max-w-5xl mx-auto rounded-xl">
                 <ClubCardGrid title="Другие кружки" clubs={getJoinableClubs()} />
             </div>
         </main>

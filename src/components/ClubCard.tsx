@@ -46,7 +46,7 @@ function ClubCard({ club }: ClubCardProps) {
 
                 <Card.Footer className="flex gap-2">
                     <Avatar className="size-5">
-                        <Avatar.Image alt={getUserFullName(currentUser)} src={leader.avatarUrl} />
+                        <Avatar.Image alt={getUserFullName(leader)} src={leader.avatarUrl} />
                         <Avatar.Fallback className="text-xs">{getUserAvatarFallback(leader)}</Avatar.Fallback>
                     </Avatar>
                     <span className="text-xs">{getUserFullName(leader)}</span>
