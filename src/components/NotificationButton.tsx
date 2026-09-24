@@ -17,10 +17,12 @@ function NotificationButton({ notifications }: NotificationButtonProps) {
 
     return (
         <Dropdown>
-            <Button isIconOnly variant="ghost">
+            <Button isIconOnly variant="ghost" size="lg">
                 <Badge.Anchor>
                     <Bell />
-                    <Badge color="danger" placement="bottom-right" size="sm">{unreadCount}</Badge>
+                    {unreadCount > 0 && (
+                        <Badge color="danger" size="sm" className="translate-x-1/4 -translate-y-1/4"></Badge>
+                    )}
                 </Badge.Anchor>
             </Button>
 
