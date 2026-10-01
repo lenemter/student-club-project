@@ -1,27 +1,90 @@
-import { Avatar, Button, Card, Typography } from "@heroui/react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { Avatar, Button, Card, Typography, Modal, Checkbox } from "@heroui/react";
+import { Calendar, Check, Xmark } from "@gravity-ui/icons";
 import HeaderBar from "../components/HeaderBar";
 import AvatarGroup from "../components/AvatarGroup";
-import { Calendar } from "@gravity-ui/icons";
 import { mockClubs } from "../data/mockClubs";
-import type { Club, User } from "../types";
-import { getClubMembers, getMemberCountText, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
-import { useParams } from "react-router-dom";
-
+import { currentUser } from "../data/mockUsers";
+import { mockAttendance } from "../data/mockAttendance";
+import { mockJoinRequests } from "../data/mockJoinRequests";
+import { mockMemberships } from "../data/mockMemberships";
+import type { Club, User, AttendanceRecord, JoinRequest } from "../types";
+import {
+    getClubMembers,
+    getMemberCountText,
+    getUserAvatarFallback,
+    getUserById,
+    getUserFullName,
+} from "../data/helper";
 
 function ClubPage() {
-    const { id } = useParams<{ id: string }>()
+    const { id } = useParams<{ id: string }>();
+    const clubId = Number(id);
 
-    const club: Club | undefined = mockClubs.find((c) => c.id === Number(id))
-    if (!club) {
-        return <div>Кружок  не найден</div>
+    const club: Club | undefined = mockClubs.find((c) => c.id === clubId);
+    const leader: User | undefined = club ? getUserById(club.leaderId) : undefined;
+
+    const [members, setMembers] = useState<User[]>(club ? getClubMembers(club) : []);
+    const [attendanceList, setAttendanceList] = useState<AttendanceRecord[]>(
+        mockAttendance.filter((a) => a.clubId === clubId),
+    );
+    const [requests, setRequests] = useState<JoinRequest[]>(
+        mockJoinRequests.filter((r) => r.clubId === clubId && r.status === "pending"),
+    );
+    const [myRequestStatus, setMyRequestStatus] = useState<"none" | "pending" | "approved">(
+        mockJoinRequests.find((r) => r.clubId === clubId && r.userId === currentUser.id)?.status === "pending"
+            ? "pending"
+            : mockMemberships.some((m) => m.clubId === clubId && m.userId === currentUser.id)
+              ? "approved"
+              : "none",
+    );
+
+    const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+    const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+
+    if (!club || !leader) {
+        return <div className="p-8 text-center">Кружок не найден</div>;
     }
 
-    const leader: User | undefined = getUserById(club.leaderId)
-    if (!leader) {
-        return <div>Руководитель не найден</div>
-    }
+    const isLeader = club.leaderId === currentUser.id;
 
-    const members = getClubMembers(club)
+    const handleJoin = () => {
+        setMyRequestStatus("pending");
+    };
+
+    const handleCancelRequest = () => {
+        setMyRequestStatus("none");
+    };
+
+    const handleLeave = () => {
+        setMembers(members.filter((m) => m.id !== currentUser.id));
+        setMyRequestStatus("none");
+    };
+
+    const handleApproveRequest = (reqId: number, userId: number) => {
+        setRequests(requests.filter((r) => r.id !== reqId));
+        const userToAdd = getUserById(userId);
+        if (userToAdd && !members.some((m) => m.id === userId)) {
+            setMembers([...members, userToAdd]);
+        }
+    };
+
+    const handleRejectRequest = (reqId: number) => {
+        setRequests(requests.filter((r) => r.id !== reqId));
+    };
+
+    const handleSaveAttendance = () => {
+        const newRecord: AttendanceRecord = {
+            id: Date.now(),
+            clubId,
+            date: new Date().toISOString(),
+            attendedUserIds: selectedUserIds,
+        };
+        setAttendanceList([newRecord, ...attendanceList]);
+        setIsAttendanceModalOpen(false);
+        setSelectedUserIds([]);
+    };
 
     return (
         <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
@@ -49,22 +112,138 @@ function ClubPage() {
 
                         <div className="flex flex-col gap-2">
                             <Typography type="h3">О кружке</Typography>
-                            {club.description ? (
-                                <Typography>{club.description}</Typography>
+                            <Typography>{club.description || "Описание пока не добавлено."}</Typography>
+                        </div>
+
+                        {isLeader && requests.length > 0 && (
+                            <Card className="p-4 border-accent">
+                                <Typography type="h3" className="mb-3">
+                                    Входящие заявки ({requests.length})
+                                </Typography>
+                                <div className="flex flex-col gap-2">
+                                    {requests.map((req) => {
+                                        const reqUser = getUserById(req.userId);
+                                        if (!reqUser) return null;
+                                        return (
+                                            <div
+                                                key={req.id}
+                                                className="flex items-center justify-between bg-surface p-2 rounded-xl"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Avatar size="sm">
+                                                        <Avatar.Image src={reqUser.avatarUrl} />
+                                                        <Avatar.Fallback>
+                                                            {getUserAvatarFallback(reqUser)}
+                                                        </Avatar.Fallback>
+                                                    </Avatar>
+                                                    <span className="text-sm font-medium">
+                                                        {getUserFullName(reqUser)}
+                                                    </span>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="primary"
+                                                        className="bg-success"
+                                                        isIconOnly
+                                                        onPress={() => handleApproveRequest(req.id, req.userId)}
+                                                    >
+                                                        <Check />
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="danger"
+                                                        isIconOnly
+                                                        onPress={() => handleRejectRequest(req.id)}
+                                                    >
+                                                        <Xmark />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </Card>
+                        )}
+
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <Typography type="h3">Посещаемость</Typography>
+                                {isLeader && (
+                                    <Button size="sm" onPress={() => setIsAttendanceModalOpen(true)}>
+                                        Отметить занятие
+                                    </Button>
+                                )}
+                            </div>
+
+                            {attendanceList.length === 0 ? (
+                                <Typography className="text-muted">Занятия ещё не фиксировались</Typography>
                             ) : (
-                                <Typography className="text-muted">Описание пока не добавлено</Typography>
+                                <div className="flex flex-col gap-3">
+                                    {attendanceList.map((rec) => (
+                                        <Card key={rec.id} className="p-4">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="font-semibold text-sm">
+                                                    {new Date(rec.date).toLocaleDateString("ru-RU", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                    })}
+                                                </span>
+                                                <span className="text-xs text-muted">
+                                                    Присутствовало: {rec.attendedUserIds.length} из {members.length}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {members.map((m) => {
+                                                    const attended = rec.attendedUserIds.includes(m.id);
+                                                    return (
+                                                        <div
+                                                            key={m.id}
+                                                            className={`text-xs px-2.5 py-1 rounded-full flex gap-1 ${
+                                                                attended
+                                                                    ? "bg-success text-success-foreground"
+                                                                    : "bg-default text-muted"
+                                                            }`}
+                                                        >
+                                                            {attended ? <Check /> : <Xmark />} {m.firstName}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
 
                     <Card className="lg:sticky lg:top-8">
                         <Card.Content className="flex flex-col gap-5">
-                            <Button size="lg" className="w-full">Вступить</Button>
+                            {isLeader ? (
+                                <Button size="lg" className="w-full" isDisabled>
+                                    Вы руководитель
+                                </Button>
+                            ) : myRequestStatus === "approved" ? (
+                                <Button size="lg" variant="danger" className="w-full" onPress={handleLeave}>
+                                    Выйти из кружка
+                                </Button>
+                            ) : myRequestStatus === "pending" ? (
+                                <Button size="lg" variant="secondary" className="w-full" onPress={handleCancelRequest}>
+                                    Отменить заявку
+                                </Button>
+                            ) : (
+                                <Button size="lg" className="w-full" onPress={handleJoin}>
+                                    Вступить в кружок
+                                </Button>
+                            )}
 
                             <div className="flex items-center gap-3">
                                 <Avatar className="size-10">
-                                    <Avatar.Image alt={`Руководитель ${getUserFullName(leader)}`} src={leader.avatarUrl} />
-                                    <Avatar.Fallback className="text-xs">{getUserAvatarFallback(leader)}</Avatar.Fallback>
+                                    <Avatar.Image alt={getUserFullName(leader)} src={leader.avatarUrl} />
+                                    <Avatar.Fallback className="text-xs">
+                                        {getUserAvatarFallback(leader)}
+                                    </Avatar.Fallback>
                                 </Avatar>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-muted">Руководитель</span>
@@ -76,19 +255,60 @@ function ClubPage() {
                                 <span className="text-xs text-muted">Расписание</span>
                                 <div className="flex items-start gap-2">
                                     <Calendar className="size-4 mt-0.5 shrink-0 text-muted" />
-                                    {club.schedule ? (
-                                        <span className="whitespace-pre-line">{club.schedule}</span>
-                                    ) : (
-                                        <span className="text-muted">Пока не указано</span>
-                                    )}
+                                    <span className="whitespace-pre-line">{club.schedule || "Пока не указано"}</span>
                                 </div>
                             </div>
                         </Card.Content>
                     </Card>
                 </div>
             </div>
+
+            <Modal isOpen={isAttendanceModalOpen} onOpenChange={setIsAttendanceModalOpen}>
+                <Modal.Backdrop>
+                    <Modal.Container>
+                        <Modal.Dialog>
+                            <Modal.CloseTrigger />
+                            <Modal.Header>
+                                <Modal.Heading>Отметка посещаемости</Modal.Heading>
+                            </Modal.Header>
+                            <Modal.Body className="flex flex-col gap-3">
+                                <p className="text-sm text-muted">
+                                    Отметьте участников, присутствовавших на занятии сегодня:
+                                </p>
+                                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
+                                    {members.map((m) => (
+                                        <div key={m.id} className="p-2 rounded-lg hover:bg-surface flex items-center">
+                                            <Checkbox
+                                                variant="secondary"
+                                                isSelected={selectedUserIds.includes(m.id)}
+                                                onChange={(isSelected) => {
+                                                    if (isSelected) {
+                                                        setSelectedUserIds([...selectedUserIds, m.id]);
+                                                    } else {
+                                                        setSelectedUserIds(selectedUserIds.filter((id) => id !== m.id));
+                                                    }
+                                                }}
+                                            >
+                                                <Checkbox.Content>
+                                                    <Checkbox.Control>
+                                                        <Checkbox.Indicator />
+                                                    </Checkbox.Control>
+                                                    {getUserFullName(m)}
+                                                </Checkbox.Content>
+                                            </Checkbox>
+                                        </div>
+                                    ))}
+                                </div>
+                                <Button className="mt-4" onPress={handleSaveAttendance}>
+                                    Зафиксировать
+                                </Button>
+                            </Modal.Body>
+                        </Modal.Dialog>
+                    </Modal.Container>
+                </Modal.Backdrop>
+            </Modal>
         </main>
     );
 }
 
-export default ClubPage
+export default ClubPage;
