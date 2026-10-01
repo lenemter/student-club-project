@@ -13,7 +13,6 @@ function SignUpPage() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        console.log("Регистрация:", { firstName, lastName, email, password });
         navigate("/");
     }
 
