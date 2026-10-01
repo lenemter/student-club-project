@@ -115,7 +115,7 @@ function ClubPage() {
                                 <button
                                     type="button"
                                     onClick={() => setMembersModalOpen(true)}
-                                    className="flex items-center gap-3 self-start rounded-full py-1 px-2 -m-1 transition-colors hover:bg-surface-hover"
+                                    className="flex items-center gap-3 self-start rounded-full py-1 px-2 -m-1 transition-colors hover:bg-surface-hover hover:cursor-pointer"
                                     aria-label="Показать список участников"
                                 >
                                     <AvatarGroup users={members} />
