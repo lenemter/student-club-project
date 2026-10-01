@@ -1,9 +1,18 @@
 import { Check, Persons } from "@gravity-ui/icons";
 import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react";
+import { useState } from "react";
 
 function NewClubButton() {
+    const [isOpen, setIsOpen] = useState<boolean>();
+
+    function onFormSubmit(e: React.FormEvent) {
+        e.preventDefault();
+
+        setIsOpen(false);
+    }
+
     return (
-        <Modal>
+        <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
             <Button variant="primary">
                 <span className="hidden sm:inline">Создать кружок</span>
                 <IconPlus />
@@ -23,7 +32,7 @@ function NewClubButton() {
                             </p>
                         </Modal.Header>
                         <Modal.Body>
-                            <Form className="flex flex-col gap-2" onSubmit={() => {}}>
+                            <Form className="flex flex-col gap-2" onSubmit={onFormSubmit}>
                                 <TextField name="name" variant="secondary" isRequired>
                                     <Label>Название</Label>
                                     <Input placeholder="Классный кружок" />

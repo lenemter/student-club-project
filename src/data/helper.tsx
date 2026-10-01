@@ -36,7 +36,7 @@ export function getClubMembers(club: Club): User[] {
     }
 
     mockMemberships.forEach((membership) => {
-        if (membership.clubId == club.id) {
+        if (membership.clubId === club.id) {
             const user = getUserById(membership.userId);
             if (user) {
                 result.push(user);

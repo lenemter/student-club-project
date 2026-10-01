@@ -37,9 +37,9 @@ function ProfileButton() {
                 <Dropdown.Menu
                     onAction={(key) => {
                         if (key === "home") navigate("/");
-                        if (key == "profile") navigate(`/profile/${currentUser.id}`);
-                        if (key == "settings") navigate("/settings");
-                        if (key == "log-out") navigate("/login");
+                        if (key === "profile") navigate(`/profile/${currentUser.id}`);
+                        if (key === "settings") navigate("/settings");
+                        if (key === "log-out") navigate("/login");
                     }}
                 >
                     <Dropdown.Section>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Avatar, Button, Card, Typography, Modal, Checkbox } from "@heroui/react";
 import { Calendar, Check, Xmark } from "@gravity-ui/icons";
 import HeaderBar from "../components/HeaderBar";
@@ -17,6 +17,8 @@ import {
     getUserById,
     getUserFullName,
 } from "../data/helper";
+import NotFoundPage from "./NotFoundPage";
+import MembersModal from "../components/MembersModal";
 
 function ClubPage() {
     const { id } = useParams<{ id: string }>();
@@ -40,11 +42,12 @@ function ClubPage() {
               : "none",
     );
 
+    const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
     const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
     if (!club || !leader) {
-        return <div className="p-8 text-center">Кружок не найден</div>;
+        return <NotFoundPage message="Кружок не найден" />;
     }
 
     const isLeader = club.leaderId === currentUser.id;
@@ -103,10 +106,15 @@ function ClubPage() {
 
                             <div className="flex flex-col gap-3 min-w-0">
                                 <Typography type="h1">{club.name}</Typography>
-                                <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsMembersModalOpen(true)}
+                                    className="flex items-center gap-3 self-start rounded-full py-1 px-2 -m-1 transition-colors hover:bg-surface-hover"
+                                    aria-label="Показать список участников"
+                                >
                                     <AvatarGroup users={members} />
                                     <span className="text-sm text-muted">{getMemberCountText(members.length)}</span>
-                                </div>
+                                </button>
                             </div>
                         </div>
 
@@ -129,7 +137,10 @@ function ClubPage() {
                                                 key={req.id}
                                                 className="flex items-center justify-between bg-surface p-2 rounded-xl"
                                             >
-                                                <div className="flex items-center gap-2">
+                                                <Link
+                                                    to={`/profile/${reqUser.id}`}
+                                                    className="flex items-center gap-2 text-sm font-medium hover:underline"
+                                                >
                                                     <Avatar size="sm">
                                                         <Avatar.Image src={reqUser.avatarUrl} />
                                                         <Avatar.Fallback>
@@ -139,7 +150,8 @@ function ClubPage() {
                                                     <span className="text-sm font-medium">
                                                         {getUserFullName(reqUser)}
                                                     </span>
-                                                </div>
+                                                </Link>
+
                                                 <div className="flex gap-1">
                                                     <Button
                                                         size="sm"
@@ -238,7 +250,10 @@ function ClubPage() {
                                 </Button>
                             )}
 
-                            <div className="flex items-center gap-3">
+                            <Link
+                                to={`/profile/${leader.id}`}
+                                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                            >
                                 <Avatar className="size-10">
                                     <Avatar.Image alt={getUserFullName(leader)} src={leader.avatarUrl} />
                                     <Avatar.Fallback className="text-xs">
@@ -249,7 +264,7 @@ function ClubPage() {
                                     <span className="text-xs text-muted">Руководитель</span>
                                     <span className="font-medium">{getUserFullName(leader)}</span>
                                 </div>
-                            </div>
+                            </Link>
 
                             <div className="flex flex-col gap-2">
                                 <span className="text-xs text-muted">Расписание</span>
@@ -307,6 +322,13 @@ function ClubPage() {
                     </Modal.Container>
                 </Modal.Backdrop>
             </Modal>
+
+            <MembersModal
+                isOpen={isMembersModalOpen}
+                onOpenChange={setIsMembersModalOpen}
+                members={members}
+                leaderId={club.leaderId}
+            />
         </main>
     );
 }
