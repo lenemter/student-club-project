@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Avatar, Button, Card, FieldError, Form, Input, Label, TextArea, TextField, Typography } from "@heroui/react";
-import { ArrowLeft, TrashBin } from "@gravity-ui/icons";
+import { TrashBin } from "@gravity-ui/icons";
 import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
 import { currentUser } from "../data/mockUsers";
@@ -64,7 +64,7 @@ function SettingsPage() {
                             <Avatar className="size-24 rounded-full shrink-0">
                                 <Avatar.Image alt={`${firstName} ${lastName}`} src={avatarUrl} />
                                 <Avatar.Fallback className="text-xl">
-                                    {getUserAvatarFallback({ firstName, lastName } as any)}
+                                    {getUserAvatarFallback(currentUser)}
                                 </Avatar.Fallback>
                             </Avatar>
 

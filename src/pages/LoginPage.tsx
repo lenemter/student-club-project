@@ -10,7 +10,7 @@ function LoginPage() {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log("Вход:", { email, password });
+
         navigate("/");
     }
 
