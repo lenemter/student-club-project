@@ -1,10 +1,10 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import HomePage from './pages/HomePage'
-import LoginPage from './pages/LoginPage'
-import SignUpPage from './pages/SignUpPage'
-import ProfilePage from './pages/ProfilePage'
-import ClubPage from './pages/ClubPage'
-import SettingsPage from './pages/SettingsPage'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+import ProfilePage from "./pages/ProfilePage";
+import ClubPage from "./pages/ClubPage";
+import SettingsPage from "./pages/SettingsPage";
 
 const router = createBrowserRouter([
     { path: "/", element: <HomePage /> },
@@ -13,10 +13,10 @@ const router = createBrowserRouter([
     { path: "/settings", element: <SettingsPage /> },
     { path: "/profile/:id", element: <ProfilePage /> },
     { path: "/club/:id", element: <ClubPage /> },
-])
+]);
 
 function App() {
-    return <RouterProvider router={router} />
+    return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
