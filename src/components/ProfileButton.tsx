@@ -52,7 +52,6 @@ function ProfileButton() {
                         </Dropdown.Item>
 
                         <Dropdown.Item
-                            isDisabled
                             className="flex flex-col items-start gap-1"
                             id="settings"
                             textValue="Настройки"
