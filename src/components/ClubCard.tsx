@@ -23,7 +23,7 @@ function ClubCard({ club }: ClubCardProps) {
         <Button
             variant="ghost"
             onPress={() => navigate(`/club/${club.id}`)}
-            className="w-full h-auto p-0 block text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg"
+            className="w-full h-auto p-0 block text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg dark:hover:shadow-none dark:hover:ring-1 dark:hover:ring-border"
         >
             <Card>
                 <img

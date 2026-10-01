@@ -162,8 +162,9 @@ function ClubPage() {
                                                     <Button
                                                         size="sm"
                                                         variant="primary"
-                                                        className="bg-success"
+                                                        className="bg-success text-success-foreground"
                                                         isIconOnly
+                                                        aria-label="Принять заявку"
                                                         onPress={() => handleApproveRequest(req.id, req.userId)}
                                                     >
                                                         <Check />
@@ -220,7 +221,7 @@ function ClubPage() {
                                                             key={m.id}
                                                             className={`text-xs px-2.5 py-1 rounded-full flex gap-1 ${
                                                                 attended
-                                                                    ? "bg-success text-success-foreground"
+                                                                    ? "bg-success-soft text-success-soft-foreground"
                                                                     : "bg-default text-muted"
                                                             }`}
                                                         >

@@ -54,6 +54,9 @@
   /* Make sure to load Inter font in your app */
   /* --font-sans: var(--font-inter); */
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --success-soft: oklch(93% 0.06 157);
+  --success-soft-foreground: oklch(38% 0.10 157);
 }
 
 .dark,
@@ -91,4 +94,7 @@
   --surface-tertiary-foreground: oklch(99.11% 0.0107 305.00);
   --warning: oklch(82.03% 0.1418 82.48);
   --warning-foreground: oklch(21.03% 0.0059 82.48);
+
+  --success-soft: oklch(32% 0.07 157);
+  --success-soft-foreground: oklch(86% 0.14 157);
 }

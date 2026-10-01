@@ -5,7 +5,7 @@ import { Badge, Button, Dropdown, Label } from "@heroui/react";
 const notificationIcons = {
     success: { icon: CircleCheck, color: "text-success" },
     info: { icon: CircleInfo, color: "text-accent" },
-    warning: { icon: TriangleExclamation, color: "text-danger" },
+    warning: { icon: TriangleExclamation, color: "text-warning" },
 };
 
 interface NotificationButtonProps {
