@@ -13,7 +13,7 @@ function NewClubButton() {
 
     return (
         <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
-            <Button variant="primary">
+            <Button variant="secondary">
                 <span className="hidden sm:inline">Создать кружок</span>
                 <IconPlus />
             </Button>

@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Card, FieldError, Form, Input, Label, TextArea, TextField, Typography } from "@heroui/react";
 import { TrashBin } from "@gravity-ui/icons";
-import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/HeaderBar";
 import { currentUser } from "../data/mockUsers";
-import { getUserAvatarFallback } from "../data/helper";
+
+const ABOUT_ME_MAX_LENGTH = 200;
 
 function SettingsPage() {
     const navigate = useNavigate();
@@ -15,17 +16,20 @@ function SettingsPage() {
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || "");
     const [aboutMe, setAboutMe] = useState(currentUser.aboutMe || "");
 
+    const avatarFallback = (firstName[0] ?? "") + (lastName[0] ?? "");
+    const profilePath = `/profile/${currentUser.id}`;
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === "string") {
-                    setAvatarUrl(reader.result);
-                }
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === "string") {
+                setAvatarUrl(reader.result);
+            }
+        };
+        reader.readAsDataURL(file);
     };
 
     const handleRemoveAvatar = () => {
@@ -38,119 +42,124 @@ function SettingsPage() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        currentUser.firstName = firstName;
-        currentUser.lastName = lastName;
+        currentUser.firstName = firstName.trim();
+        currentUser.lastName = lastName.trim();
         currentUser.avatarUrl = avatarUrl;
-        currentUser.aboutMe = aboutMe;
+        currentUser.aboutMe = aboutMe.trim();
 
-        navigate(`/profile/${currentUser.id}`);
+        navigate(profilePath);
     }
 
     return (
         <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
-            <div className="w-full max-w-5xl flex flex-col gap-8">
-                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <Typography type="h1">Настройки профиля</Typography>
-                    </div>
-                    <div className="self-end sm:self-auto">
-                        <HeaderBar />
-                    </div>
+            <div className="w-full max-w-2xl flex flex-col gap-6">
+                <div className="w-full flex justify-end">
+                    <HeaderBar />
                 </div>
 
-                <Card className="p-6 sm:p-8">
-                    <Form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-border">
-                            <Avatar className="size-24 rounded-full shrink-0">
-                                <Avatar.Image alt={`${firstName} ${lastName}`} src={avatarUrl} />
-                                <Avatar.Fallback className="text-xl">
-                                    {getUserAvatarFallback(currentUser)}
-                                </Avatar.Fallback>
-                            </Avatar>
+                <Form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                    <Card className="p-6">
+                        <div className="flex flex-col gap-4">
+                            <Typography type="h4">Фото профиля</Typography>
 
-                            <div className="flex flex-col gap-3 items-center sm:items-start text-center sm:text-left">
-                                <span className="text-sm font-medium">Фото профиля</span>
+                            <div className="flex items-center gap-5">
+                                <Avatar className="size-20 sm:size-24 rounded-full shrink-0">
+                                    <Avatar.Image alt={`${firstName} ${lastName}`} src={avatarUrl} />
+                                    <Avatar.Fallback className="text-xl">{avatarFallback}</Avatar.Fallback>
+                                </Avatar>
 
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleFileChange}
-                                />
+                                <div className="flex flex-col gap-2">
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                    />
 
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        onPress={() => fileInputRef.current?.click()}
-                                    >
-                                        Загрузить фото
-                                    </Button>
-
-                                    {avatarUrl && (
+                                    <div className="flex items-center gap-2">
                                         <Button
                                             type="button"
-                                            variant="ghost"
-                                            isIconOnly
-                                            onPress={handleRemoveAvatar}
-                                            aria-label="Удалить фото"
+                                            variant="secondary"
+                                            onPress={() => fileInputRef.current?.click()}
                                         >
-                                            <TrashBin className="size-4 text-danger" />
+                                            Загрузить фото
                                         </Button>
-                                    )}
+
+                                        {avatarUrl && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                isIconOnly
+                                                onPress={handleRemoveAvatar}
+                                                aria-label="Удалить фото"
+                                            >
+                                                <TrashBin className="size-4 text-danger" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <span className="text-xs text-muted">JPG, PNG или WEBP</span>
                                 </div>
-                                <span className="text-xs text-muted">Поддерживаются форматы JPG, PNG или WEBP.</span>
                             </div>
                         </div>
+                    </Card>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <TextField
-                                name="firstName"
-                                variant="secondary"
-                                isRequired
-                                value={firstName}
-                                onChange={setFirstName}
-                            >
-                                <Label>Имя</Label>
-                                <Input />
-                                <FieldError />
-                            </TextField>
+                    <Card className="p-6">
+                        <div className="flex flex-col gap-4">
+                            <Typography type="h4">Личные данные</Typography>
 
-                            <TextField
-                                name="lastName"
-                                variant="secondary"
-                                isRequired
-                                value={lastName}
-                                onChange={setLastName}
-                            >
-                                <Label>Фамилия</Label>
-                                <Input />
-                                <FieldError />
-                            </TextField>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <TextField
+                                    name="firstName"
+                                    variant="secondary"
+                                    isRequired
+                                    value={firstName}
+                                    onChange={setFirstName}
+                                >
+                                    <Label>Имя</Label>
+                                    <Input />
+                                    <FieldError />
+                                </TextField>
+
+                                <TextField
+                                    name="lastName"
+                                    variant="secondary"
+                                    isRequired
+                                    value={lastName}
+                                    onChange={setLastName}
+                                >
+                                    <Label>Фамилия</Label>
+                                    <Input />
+                                    <FieldError />
+                                </TextField>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="aboutMe">О себе</Label>
+                                <TextArea
+                                    fullWidth
+                                    id="aboutMe"
+                                    variant="secondary"
+                                    rows={4}
+                                    maxLength={ABOUT_ME_MAX_LENGTH}
+                                    placeholder="Курс, интересы, чем занимаетесь"
+                                    value={aboutMe}
+                                    onChange={(e) => setAboutMe(e.target.value)}
+                                />
+                                <span className="text-xs text-muted self-end">
+                                    {aboutMe.length}/{ABOUT_ME_MAX_LENGTH}
+                                </span>
+                            </div>
                         </div>
+                    </Card>
 
-                        <div>
-                            <Label htmlFor="aboutMe" className="mb-1 block text-sm font-medium">
-                                О себе
-                            </Label>
-                            <TextArea
-                                fullWidth
-                                id="aboutMe"
-                                variant="secondary"
-                                value={aboutMe}
-                                onChange={(e) => setAboutMe(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex justify-end items-center gap-3 pt-4 border-t border-border">
-                            <Button type="button" variant="ghost" onPress={() => navigate(-1)}>
-                                Отмена
-                            </Button>
-                            <Button type="submit">Сохранить изменения</Button>
-                        </div>
-                    </Form>
-                </Card>
+                    <div className="flex justify-end gap-3">
+                        <Button type="button" variant="ghost" onPress={() => navigate(profilePath)}>
+                            Отмена
+                        </Button>
+                        <Button type="submit">Сохранить</Button>
+                    </div>
+                </Form>
             </div>
         </main>
     );

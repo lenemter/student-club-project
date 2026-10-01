@@ -5,9 +5,6 @@ import PasswordField from "../components/PasswordField";
 
 function SignUpPage() {
     const navigate = useNavigate();
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     function handleSubmit(e: React.FormEvent) {
@@ -27,13 +24,13 @@ function SignUpPage() {
                         </Typography>
                     </div>
 
-                    <TextField name="firstName" variant="secondary" isRequired onChange={(str) => setFirstName(str)}>
+                    <TextField name="firstName" variant="secondary" isRequired>
                         <Label>Имя</Label>
                         <Input placeholder="Иван" />
                         <FieldError />
                     </TextField>
 
-                    <TextField name="lastName" variant="secondary" isRequired onChange={(str) => setLastName(str)}>
+                    <TextField name="lastName" variant="secondary" isRequired>
                         <Label>Фамилия</Label>
                         <Input placeholder="Петров" />
                         <FieldError />
@@ -45,7 +42,6 @@ function SignUpPage() {
                         type="email"
                         autoComplete="email"
                         isRequired
-                        onChange={(str) => setEmail(str)}
                     >
                         <Label>Email</Label>
                         <Input placeholder="example@example.com" />
