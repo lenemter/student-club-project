@@ -28,7 +28,7 @@ export function getJoinableClubs(): Club[] {
     const myClubIds = mockMemberships
         .filter((m) => m.userId === currentUser.id)
         .map((m) => m.clubId);
-    return mockClubs.filter((c) => !myClubIds.includes(c.id));
+    return mockClubs.filter((c) => !myClubIds.includes(c.id) && c.leaderId !== currentUser.id);
 }
 
 export function getClubMembers(club: Club): User[] {
