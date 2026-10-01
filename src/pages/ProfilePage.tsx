@@ -1,16 +1,16 @@
-import { Avatar, Typography } from "@heroui/react"
-import ClubCardGrid from "../components/ClubCardGrid"
-import { getUserClubs, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper"
-import HeaderBar from "../components/HeaderBar"
-import type { User } from "../types"
-import { useParams } from "react-router-dom"
+import { Avatar, Typography } from "@heroui/react";
+import ClubCardGrid from "../components/ClubCardGrid";
+import { getUserClubs, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
+import HeaderBar from "../components/HeaderBar";
+import type { User } from "../types";
+import { useParams } from "react-router-dom";
 
 function ProfilePage() {
-    const { id } = useParams<{ id: string }>()
-    const user: User | undefined = getUserById(Number(id))
+    const { id } = useParams<{ id: string }>();
+    const user: User | undefined = getUserById(Number(id));
 
     if (!user) {
-        return <div>Пользователь не найден</div>
+        return <div>Пользователь не найден</div>;
     }
 
     return (
@@ -34,7 +34,7 @@ function ProfilePage() {
                 <ClubCardGrid title="Мои кружки" clubs={getUserClubs(user.id)} />
             </div>
         </main>
-    )
+    );
 }
 
-export default ProfilePage
+export default ProfilePage;

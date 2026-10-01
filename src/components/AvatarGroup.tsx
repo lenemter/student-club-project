@@ -1,4 +1,4 @@
-import { Avatar } from "@heroui/react"
+import { Avatar } from "@heroui/react";
 import type { User } from "../types";
 import { getUserAvatarFallback, getUserFullName } from "../data/helper";
 
@@ -7,7 +7,7 @@ export interface AvatarGroupProps {
 }
 
 function AvatarGroup({ users }: AvatarGroupProps) {
-    const NUM_USERS = 3
+    const NUM_USERS = 3;
 
     return (
         <div className="flex -space-x-2">
@@ -22,11 +22,11 @@ function AvatarGroup({ users }: AvatarGroupProps) {
                 <Avatar className="ring-2 ring-background">
                     <Avatar.Fallback className="text-xs">+{users.length - 3}</Avatar.Fallback>
                 </Avatar>
-            ) : <></>}
-
-
+            ) : (
+                <></>
+            )}
         </div>
-    )
+    );
 }
 
-export default AvatarGroup
+export default AvatarGroup;

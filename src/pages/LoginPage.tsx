@@ -1,17 +1,17 @@
-import { Button, Card, FieldError, Form, Input, Label, TextField, Typography } from "@heroui/react"
-import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
-import PasswordField from "../components/PasswordField"
+import { Button, Card, FieldError, Form, Input, Label, TextField, Typography } from "@heroui/react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import PasswordField from "../components/PasswordField";
 
 function LoginPage() {
-    const navigate = useNavigate()
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        console.log("Вход:", { email, password })
-        navigate("/")
+        e.preventDefault();
+        console.log("Вход:", { email, password });
+        navigate("/");
     }
 
     return (
@@ -20,18 +20,28 @@ function LoginPage() {
                 <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-1 mb-2">
                         <Typography type="h2">Вход</Typography>
-                        <Typography type="body">
-                            Войдите, чтобы управлять своими кружками
-                        </Typography>
+                        <Typography type="body">Войдите, чтобы управлять своими кружками</Typography>
                     </div>
 
-                    <TextField name="email" variant="secondary" type="email" autoComplete="email" isRequired onChange={(str) => setEmail(str)}>
+                    <TextField
+                        name="email"
+                        variant="secondary"
+                        type="email"
+                        autoComplete="email"
+                        isRequired
+                        onChange={(str) => setEmail(str)}
+                    >
                         <Label>Email</Label>
                         <Input placeholder="example@example.com" />
                         <FieldError />
                     </TextField>
 
-                    <PasswordField label="Пароль" autoComplete="current-password" isRequired onChange={(str) => setPassword(str)}/>
+                    <PasswordField
+                        label="Пароль"
+                        autoComplete="current-password"
+                        isRequired
+                        onChange={(str) => setPassword(str)}
+                    />
 
                     <Button type="submit" size="lg" className="mt-2">
                         Войти
@@ -46,7 +56,7 @@ function LoginPage() {
                 </Form>
             </Card>
         </main>
-    )
+    );
 }
 
-export default LoginPage
+export default LoginPage;

@@ -27,7 +27,7 @@ function ClubCardGrid({ title, clubs }: ClubCardGridProps) {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
-export default ClubCardGrid
+export default ClubCardGrid;

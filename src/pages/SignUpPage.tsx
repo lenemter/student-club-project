@@ -1,20 +1,20 @@
-import { Button, Card, FieldError, Form, Input, Label, TextField, Typography } from "@heroui/react"
-import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
-import PasswordField from "../components/PasswordField"
+import { Button, Card, FieldError, Form, Input, Label, TextField, Typography } from "@heroui/react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import PasswordField from "../components/PasswordField";
 
 function SignUpPage() {
-    const navigate = useNavigate()
-    const [firstName, setFirstName] = useState("")
-    const [lastName, setLastName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const navigate = useNavigate();
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
+        e.preventDefault();
 
-        console.log("Регистрация:", { firstName, lastName, email, password })
-        navigate("/")
+        console.log("Регистрация:", { firstName, lastName, email, password });
+        navigate("/");
     }
 
     return (
@@ -40,19 +40,31 @@ function SignUpPage() {
                         <FieldError />
                     </TextField>
 
-                    <TextField name="email" variant="secondary" type="email" autoComplete="email" isRequired onChange={(str) => setEmail(str)}>
+                    <TextField
+                        name="email"
+                        variant="secondary"
+                        type="email"
+                        autoComplete="email"
+                        isRequired
+                        onChange={(str) => setEmail(str)}
+                    >
                         <Label>Email</Label>
                         <Input placeholder="example@example.com" />
                         <FieldError />
                     </TextField>
 
-                    <PasswordField label="Пароль" autoComplete="new-password" isRequired onChange={(str) => setPassword(str)} />
+                    <PasswordField
+                        label="Пароль"
+                        autoComplete="new-password"
+                        isRequired
+                        onChange={(str) => setPassword(str)}
+                    />
 
                     <PasswordField
                         label="Подтвердите пароль"
                         autoComplete="new-password"
                         isRequired
-                        validate={(value) => (value !== password ? "Пароли не совпадают." : null)} 
+                        validate={(value) => (value !== password ? "Пароли не совпадают." : null)}
                     />
 
                     <Button type="submit" size="lg" className="mt-2">
@@ -68,7 +80,7 @@ function SignUpPage() {
                 </Form>
             </Card>
         </main>
-    )
+    );
 }
 
-export default SignUpPage
+export default SignUpPage;

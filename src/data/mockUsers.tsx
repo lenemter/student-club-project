@@ -76,4 +76,4 @@ export const fallbackUser: User = {
     aboutMe: "Этого пользователя не существует",
     email: "",
     avatarUrl: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/red.jpg",
-}
+};

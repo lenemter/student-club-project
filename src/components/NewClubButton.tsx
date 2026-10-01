@@ -1,14 +1,11 @@
-import { Check, Persons } from "@gravity-ui/icons"
-import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react"
-
+import { Check, Persons } from "@gravity-ui/icons";
+import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react";
 
 function NewClubButton() {
     return (
         <Modal>
             <Button variant="primary">
-                <span className="hidden sm:inline">
-                    Создать кружок
-                </span>
+                <span className="hidden sm:inline">Создать кружок</span>
                 <IconPlus />
             </Button>
 
@@ -26,7 +23,7 @@ function NewClubButton() {
                             </p>
                         </Modal.Header>
                         <Modal.Body>
-                            <Form className="flex flex-col gap-2" onSubmit={() => { }}>
+                            <Form className="flex flex-col gap-2" onSubmit={() => {}}>
                                 <TextField name="name" variant="secondary" isRequired>
                                     <Label>Название</Label>
                                     <Input placeholder="Классный кружок" />
@@ -34,7 +31,7 @@ function NewClubButton() {
                                 </TextField>
 
                                 <div>
-                                    <Label htmlFor="description">Название</Label>
+                                    <Label htmlFor="description">Описание</Label>
                                     <TextArea
                                         fullWidth
                                         id="description"
@@ -60,7 +57,7 @@ function NewClubButton() {
                 </Modal.Container>
             </Modal.Backdrop>
         </Modal>
-    )
+    );
 }
 
-export default NewClubButton
+export default NewClubButton;

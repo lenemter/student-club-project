@@ -19,4 +19,4 @@ export const mockAttendance: AttendanceRecord[] = [
         date: "2026-09-03T18:00:00Z",
         attendedUserIds: [2, 1, 4],
     },
-]
+];

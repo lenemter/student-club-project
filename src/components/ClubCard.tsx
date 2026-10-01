@@ -1,7 +1,13 @@
-import { Avatar, Button, Card } from "@heroui/react"
+import { Avatar, Button, Card } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import type { Club, User } from "../types";
-import { getClubMembers, getMemberCountText, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
+import {
+    getClubMembers,
+    getMemberCountText,
+    getUserAvatarFallback,
+    getUserById,
+    getUserFullName,
+} from "../data/helper";
 import { fallbackUser } from "../data/mockUsers";
 
 interface ClubCardProps {
@@ -9,12 +15,16 @@ interface ClubCardProps {
 }
 
 function ClubCard({ club }: ClubCardProps) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const leader: User = getUserById(club.leaderId) ?? fallbackUser
+    const leader: User = getUserById(club.leaderId) ?? fallbackUser;
 
     return (
-        <Button variant="ghost" onPress={() => navigate(`/club/${club.id}`)} className="w-full h-auto p-0 block text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg">
+        <Button
+            variant="ghost"
+            onPress={() => navigate(`/club/${club.id}`)}
+            className="w-full h-auto p-0 block text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg"
+        >
             <Card>
                 <img
                     alt={club.name}
@@ -37,7 +47,7 @@ function ClubCard({ club }: ClubCardProps) {
                 </Card.Footer>
             </Card>
         </Button>
-    )
+    );
 }
 
-export default ClubCard
+export default ClubCard;

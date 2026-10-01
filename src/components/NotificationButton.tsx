@@ -1,19 +1,19 @@
-import type { Notification } from "../types"
-import { Bell, CircleCheck, CircleInfo, TriangleExclamation } from "@gravity-ui/icons"
-import { Badge, Button, Dropdown, Label } from "@heroui/react"
+import type { Notification } from "../types";
+import { Bell, CircleCheck, CircleInfo, TriangleExclamation } from "@gravity-ui/icons";
+import { Badge, Button, Dropdown, Label } from "@heroui/react";
 
 const notificationIcons = {
     success: { icon: CircleCheck, color: "text-success" },
     info: { icon: CircleInfo, color: "text-accent" },
     warning: { icon: TriangleExclamation, color: "text-danger" },
-}
+};
 
 interface NotificationButtonProps {
     notifications: Notification[];
 }
 
 function NotificationButton({ notifications }: NotificationButtonProps) {
-    const unreadCount = notifications.filter((n) => !n.isRead).length
+    const unreadCount = notifications.filter((n) => !n.isRead).length;
 
     return (
         <Dropdown>
@@ -35,7 +35,7 @@ function NotificationButton({ notifications }: NotificationButtonProps) {
                             </Dropdown.Item>
                         ) : (
                             notifications.map((notification) => {
-                                const { icon: Icon, color } = notificationIcons[notification.type]
+                                const { icon: Icon, color } = notificationIcons[notification.type];
                                 return (
                                     <Dropdown.Item
                                         key={notification.id}
@@ -45,25 +45,19 @@ function NotificationButton({ notifications }: NotificationButtonProps) {
                                     >
                                         <Icon className={`size-5 mt-0.5 shrink-0 ${color}`} />
                                         <div className="flex flex-col gap-1">
-                                            <Label className="font-semibold">
-                                                {notification.title}
-                                            </Label>
-                                            <span className="text-xs">
-                                                {notification.description}
-                                            </span>
-                                            <span className="text-xs text-muted">
-                                                {notification.createdAt}
-                                            </span>
+                                            <Label className="font-semibold">{notification.title}</Label>
+                                            <span className="text-xs">{notification.description}</span>
+                                            <span className="text-xs text-muted">{notification.createdAt}</span>
                                         </div>
                                     </Dropdown.Item>
-                                )
+                                );
                             })
                         )}
                     </Dropdown.Section>
                 </Dropdown.Menu>
             </Dropdown.Popover>
         </Dropdown>
-    )
+    );
 }
 
-export default NotificationButton
+export default NotificationButton;
