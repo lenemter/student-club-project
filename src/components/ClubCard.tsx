@@ -1,27 +1,11 @@
 import { Avatar, Button, Card } from "@heroui/react"
 import { useNavigate } from "react-router-dom";
 import type { Club, User } from "../types";
-import { getClubMembers, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
+import { getClubMembers, getMemberCountText, getUserAvatarFallback, getUserById, getUserFullName } from "../data/helper";
 import { fallbackUser } from "../data/mockUsers";
 
 interface ClubCardProps {
     club: Club;
-}
-
-function getMemberCountText(n: number): string {
-    if (n <= 0) {
-        return "Нет участников"
-    }
-
-    if (n % 10 === 1 && n % 100 !== 11) {
-        return `${n} участник`
-    }
-
-    if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20)) {
-        return `${n} участника`
-    }
-
-    return `${n} участников`
 }
 
 function ClubCard({ club }: ClubCardProps) {

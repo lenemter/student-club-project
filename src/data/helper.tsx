@@ -50,3 +50,19 @@ export function getClubMembers(club: Club): User[] {
 
     return result
 }
+
+export function getMemberCountText(n: number): string {
+    if (n <= 0) {
+        return "Нет участников"
+    }
+
+    if (n % 10 === 1 && n % 100 !== 11) {
+        return `${n} участник`
+    }
+
+    if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20)) {
+        return `${n} участника`
+    }
+
+    return `${n} участников`
+}
