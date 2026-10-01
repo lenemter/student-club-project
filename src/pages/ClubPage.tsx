@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Avatar, Button, Card, Typography, Modal, Checkbox } from "@heroui/react";
 import { Calendar, Check, Xmark } from "@gravity-ui/icons";
 import HeaderBar from "../components/HeaderBar";
@@ -42,9 +42,15 @@ function ClubPage() {
               : "none",
     );
 
-    const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
     const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const isMembersModalOpen = searchParams.get("members") === "1";
+
+    const setMembersModalOpen = (open: boolean) => {
+        setSearchParams(open ? { members: "1" } : {}, { replace: true });
+    };
 
     if (!club || !leader) {
         return <NotFoundPage message="Кружок не найден" />;
@@ -108,7 +114,7 @@ function ClubPage() {
                                 <Typography type="h1">{club.name}</Typography>
                                 <button
                                     type="button"
-                                    onClick={() => setIsMembersModalOpen(true)}
+                                    onClick={() => setMembersModalOpen(true)}
                                     className="flex items-center gap-3 self-start rounded-full py-1 px-2 -m-1 transition-colors hover:bg-surface-hover"
                                     aria-label="Показать список участников"
                                 >
@@ -325,7 +331,7 @@ function ClubPage() {
 
             <MembersModal
                 isOpen={isMembersModalOpen}
-                onOpenChange={setIsMembersModalOpen}
+                onOpenChange={setMembersModalOpen}
                 members={members}
                 leaderId={club.leaderId}
             />
