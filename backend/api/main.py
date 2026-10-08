@@ -2,9 +2,11 @@ import os
 import dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 import api.db
 import api.routers
+import api.utils
 
 dotenv.load_dotenv()
 
@@ -24,6 +26,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+UPLOAD_DIR = api.utils.UPLOAD_DIR
+os.makedirs(os.path.join(UPLOAD_DIR, "avatars"), exist_ok=True)
+app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
 
 app.include_router(api.routers.auth_router)
 app.include_router(api.routers.users_router)

@@ -36,3 +36,4 @@ env/
 pgdata/
 *.db
 secrets/
+uploads/

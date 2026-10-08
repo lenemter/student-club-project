@@ -1,4 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+import os
+import shutil
+import uuid
+
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
 import api.db
 import api.dependencies
@@ -31,6 +35,32 @@ async def edit_user_me(
             raise HTTPException(status.HTTP_409_CONFLICT, "Email already in use")
 
     return api.db.update_user(session, current_user, to_update)
+
+
+@router.post("/me/avatar", response_model=api.schemas.UserPublic)
+async def upload_user_avatar(
+    current_user: api.dependencies.CurrentUserDep,
+    session: api.dependencies.SessionDep,
+    file: UploadFile = File(...),
+):
+    allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file format. Allowed: JPEG, PNG, WebP, GIF",
+        )
+
+    ext = os.path.splitext(file.filename or "")[1] or ".png"
+    filename = f"{uuid.uuid4().hex}{ext}"
+    avatars_dir = os.path.join(api.utils.UPLOAD_DIR, "avatars")
+    os.makedirs(avatars_dir, exist_ok=True)
+    filepath = os.path.join(avatars_dir, filename)
+
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    avatar_url = f"/static/avatars/{filename}"
+    return api.db.update_user(session, current_user, {"avatar_url": avatar_url})
 
 
 @router.get("/{user_id}", response_model=api.schemas.UserPublic)

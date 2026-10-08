@@ -23,13 +23,7 @@ function SettingsPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (typeof reader.result === "string") {
-                setAvatarUrl(reader.result);
-            }
-        };
-        reader.readAsDataURL(file);
+        setAvatarUrl(URL.createObjectURL(file));
     };
 
     const handleRemoveAvatar = () => {
