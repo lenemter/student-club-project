@@ -1,14 +1,12 @@
-from typing import TYPE_CHECKING, Any, Union
+from typing import Any, Union
 
 from sqlmodel import Session, col, select
 
-if TYPE_CHECKING:
-    from .. import Notification
+from ..db import engine
+from ..models.notification import Notification
 
 
-def get_user_notifications(user_id: int) -> list["Notification"]:
-    from .. import Notification, engine
-
+def get_user_notifications(user_id: int) -> list[Notification]:
     with Session(engine) as session:
         return list(
             session.exec(
@@ -19,16 +17,12 @@ def get_user_notifications(user_id: int) -> list["Notification"]:
         )
 
 
-def get_notification_by_id(notification_id: int) -> Union["Notification", None]:
-    from .. import Notification, engine
-
+def get_notification_by_id(notification_id: int) -> Union[Notification, None]:
     with Session(engine) as session:
         return session.get(Notification, notification_id)
 
 
-def create_notification(**kwargs) -> "Notification":
-    from .. import Notification, engine
-
+def create_notification(**kwargs) -> Notification:
     with Session(engine) as session:
         notif = Notification(**kwargs)
         session.add(notif)
@@ -39,8 +33,8 @@ def create_notification(**kwargs) -> "Notification":
 
 
 def update_notification(
-    session: Session, notification: "Notification", update: dict[str, Any]
-) -> "Notification":
+    session: Session, notification: Notification, update: dict[str, Any]
+) -> Notification:
     notification.sqlmodel_update(update)
     session.add(notification)
     session.commit()
@@ -49,6 +43,6 @@ def update_notification(
     return notification
 
 
-def delete_notification(session: Session, notification: "Notification") -> None:
+def delete_notification(session: Session, notification: Notification) -> None:
     session.delete(notification)
     session.commit()

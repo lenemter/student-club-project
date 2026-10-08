@@ -2,8 +2,6 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-from .unset_type import Unset, UnsetType
-
 
 class JoinRequestBase(BaseModel):
     model_config = ConfigDict(

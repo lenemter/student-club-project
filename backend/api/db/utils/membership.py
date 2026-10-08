@@ -1,23 +1,17 @@
-from typing import TYPE_CHECKING
-
 from sqlmodel import Session, select
 
-if TYPE_CHECKING:
-    from .. import Membership
+from ..db import engine
+from ..models.membership import Membership
 
 
-def get_club_memberships(club_id: int) -> list["Membership"]:
-    from .. import Membership, engine
-
+def get_club_memberships(club_id: int) -> list[Membership]:
     with Session(engine) as session:
         return list(
             session.exec(select(Membership).where(Membership.club_id == club_id)).all()
         )
 
 
-def get_user_memberships(user_id: int) -> list["Membership"]:
-    from .. import Membership, engine
-
+def get_user_memberships(user_id: int) -> list[Membership]:
     with Session(engine) as session:
         return list(
             session.exec(select(Membership).where(Membership.user_id == user_id)).all()
@@ -25,8 +19,6 @@ def get_user_memberships(user_id: int) -> list["Membership"]:
 
 
 def is_club_member(club_id: int, user_id: int) -> bool:
-    from .. import Membership, engine
-
     with Session(engine) as session:
         membership = session.exec(
             select(Membership).where(
@@ -36,9 +28,7 @@ def is_club_member(club_id: int, user_id: int) -> bool:
         return membership is not None
 
 
-def add_member(club_id: int, user_id: int) -> "Membership":
-    from .. import Membership, engine
-
+def add_member(club_id: int, user_id: int) -> Membership:
     with Session(engine) as session:
         existing = session.exec(
             select(Membership).where(
@@ -58,8 +48,6 @@ def add_member(club_id: int, user_id: int) -> "Membership":
 
 
 def remove_member(club_id: int, user_id: int) -> None:
-    from .. import Membership, engine
-
     with Session(engine) as session:
         membership = session.exec(
             select(Membership).where(

@@ -1,15 +1,13 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Union
+from typing import Union
 
 from sqlmodel import Session, select
 
-if TYPE_CHECKING:
-    from .. import AttendanceRecord, AttendanceUser
+from ..db import engine
+from ..models.attendance import AttendanceRecord, AttendanceUser
 
 
 def get_attended_user_ids(session: Session, record_id: int) -> list[int]:
-    from .. import AttendanceUser
-
     return list(
         session.exec(
             select(AttendanceUser.user_id).where(AttendanceUser.attendance_id == record_id)
@@ -17,9 +15,7 @@ def get_attended_user_ids(session: Session, record_id: int) -> list[int]:
     )
 
 
-def get_club_attendance(club_id: int) -> list[tuple["AttendanceRecord", list[int]]]:
-    from .. import AttendanceRecord, engine
-
+def get_club_attendance(club_id: int) -> list[tuple[AttendanceRecord, list[int]]]:
     with Session(engine, expire_on_commit=False) as session:
         records = session.exec(
             select(AttendanceRecord).where(AttendanceRecord.club_id == club_id)
@@ -33,9 +29,7 @@ def get_club_attendance(club_id: int) -> list[tuple["AttendanceRecord", list[int
         return result
 
 
-def get_attendance_by_id(record_id: int) -> Union[tuple["AttendanceRecord", list[int]], None]:
-    from .. import AttendanceRecord, engine
-
+def get_attendance_by_id(record_id: int) -> Union[tuple[AttendanceRecord, list[int]], None]:
     with Session(engine, expire_on_commit=False) as session:
         record = session.get(AttendanceRecord, record_id)
         if record is None:
@@ -47,9 +41,7 @@ def get_attendance_by_id(record_id: int) -> Union[tuple["AttendanceRecord", list
 
 def create_attendance(
     club_id: int, date: datetime | None, attended_user_ids: list[int]
-) -> tuple["AttendanceRecord", list[int]]:
-    from .. import AttendanceRecord, AttendanceUser, engine
-
+) -> tuple[AttendanceRecord, list[int]]:
     with Session(engine, expire_on_commit=False) as session:
         record = AttendanceRecord(
             club_id=club_id,
@@ -71,12 +63,10 @@ def create_attendance(
 
 def update_attendance(
     session: Session,
-    record: "AttendanceRecord",
+    record: AttendanceRecord,
     date: datetime | None = None,
     attended_user_ids: list[int] | None = None,
-) -> tuple["AttendanceRecord", list[int]]:
-    from .. import AttendanceUser
-
+) -> tuple[AttendanceRecord, list[int]]:
     assert record.id is not None
 
     if date is not None:
@@ -101,6 +91,6 @@ def update_attendance(
     return record, current_user_ids
 
 
-def delete_attendance(session: Session, record: "AttendanceRecord") -> None:
+def delete_attendance(session: Session, record: AttendanceRecord) -> None:
     session.delete(record)
     session.commit()
