@@ -61,6 +61,8 @@ def get_joinable_clubs(user_id: int | None) -> list["Club"]:
 def create_club(leader: "User", **kwargs) -> "Club":
     from .. import Club, engine
 
+    assert leader.id is not None
+
     with Session(engine) as session:
         new_club = Club(leader_id=leader.id, **kwargs)
         session.add(new_club)
