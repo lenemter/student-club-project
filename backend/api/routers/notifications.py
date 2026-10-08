@@ -9,7 +9,8 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 @router.get("/", response_model=list[api.schemas.NotificationPublic])
 async def get_my_notifications(current_user: api.dependencies.CurrentUserDep):
-    return api.db.get_user_notifications(current_user.id)  # type: ignore
+    assert current_user.id is not None
+    return api.db.get_user_notifications(current_user.id)
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api.schemas.NotificationPublic)

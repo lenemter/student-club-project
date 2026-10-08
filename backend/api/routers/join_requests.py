@@ -40,11 +40,14 @@ async def create_join_request(
     if club.leader_id == current_user.id:
         raise HTTPException(status.HTTP_409_CONFLICT, "You are already the leader of this club")
 
-    if api.db.is_club_member(club.id, current_user.id):  # type: ignore
+    assert club.id is not None
+    assert current_user.id is not None
+
+    if api.db.is_club_member(club.id, current_user.id):
         raise HTTPException(status.HTTP_409_CONFLICT, "You are already a member of this club")
 
     new_req = api.db.create_join_request(
-        user_id=current_user.id, club_id=request_data.club_id  # type: ignore
+        user_id=current_user.id, club_id=request_data.club_id
     )
 
     # Notify club leader
@@ -95,7 +98,10 @@ async def update_join_request(
     )
 
     if request_update.status == "approved":
-        api.db.add_member(club.id, req.user_id)  # type: ignore
+        assert club.id is not None
+        assert req.user_id is not None
+
+        api.db.add_member(club.id, req.user_id)
         api.db.create_notification(
             user_id=req.user_id,
             title="Заявка одобрена",

@@ -9,7 +9,9 @@ router = APIRouter(tags=["attendance"])
 
 @router.get("/clubs/{club_id}/attendance/", response_model=list[api.schemas.AttendanceRecordPublic])
 async def get_club_attendance(club: api.dependencies.ClubDep):
-    records_with_users = api.db.get_club_attendance(club.id)  # type: ignore
+    assert club.id is not None
+
+    records_with_users = api.db.get_club_attendance(club.id)
     result = []
     for record, user_ids in records_with_users:
         assert record.id is not None
@@ -33,8 +35,10 @@ async def create_attendance(
     club: api.dependencies.ClubLeaderAccessDep,
     attendance_create: api.schemas.AttendanceRecordCreate,
 ):
+    assert club.id is not None
+
     record, user_ids = api.db.create_attendance(
-        club_id=club.id,  # type: ignore
+        club_id=club.id,
         date=attendance_create.date,
         attended_user_ids=attendance_create.attended_user_ids,
     )

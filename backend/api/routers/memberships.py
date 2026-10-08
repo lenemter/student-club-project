@@ -9,12 +9,14 @@ router = APIRouter(tags=["memberships"])
 
 @router.get("/clubs/{club_id}/memberships/", response_model=list[api.schemas.MembershipPublic])
 async def get_club_memberships(club: api.dependencies.ClubDep):
-    return api.db.get_club_memberships(club.id)  # type: ignore
+    assert club.id is not None
+    return api.db.get_club_memberships(club.id)
 
 
 @router.get("/users/me/memberships", response_model=list[api.schemas.MembershipPublic])
 async def get_my_memberships(current_user: api.dependencies.CurrentUserDep):
-    return api.db.get_user_memberships(current_user.id)  # type: ignore
+    assert current_user.id is not None
+    return api.db.get_user_memberships(current_user.id)
 
 
 @router.post(
@@ -32,7 +34,8 @@ async def add_member(
     if api.db.get_user_by_id(user_id) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
 
-    return api.db.add_member(club.id, user_id)  # type: ignore
+    assert club.id is not None
+    return api.db.add_member(club.id, user_id)
 
 
 @router.delete("/clubs/{club_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -48,4 +51,5 @@ async def remove_member(
     if club.leader_id == user_id:
         raise HTTPException(status.HTTP_409_CONFLICT, "Cannot remove the leader from the club")
 
-    api.db.remove_member(club.id, user_id)  # type: ignore
+    assert club.id is not None
+    api.db.remove_member(club.id, user_id)

@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Union
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, or_, select
 
 if TYPE_CHECKING:
     from .. import Club, Membership, User
@@ -34,7 +34,7 @@ def get_user_clubs(user_id: int | None) -> list["Club"]:
 
         clubs = session.exec(
             select(Club).where(
-                (Club.leader_id == user_id) | (Club.id.in_(member_club_ids))  # type: ignore
+                or_(Club.leader_id == user_id, col(Club.id).in_(member_club_ids))
             )
         ).all()
 

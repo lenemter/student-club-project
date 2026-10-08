@@ -54,4 +54,5 @@ async def delete_club(
 
 @router.get("/{club_id}/members", response_model=list[api.schemas.UserPublic])
 async def get_club_members(club: api.dependencies.ClubDep):
-    return api.db.get_club_members(club.id)  # type: ignore
+    assert club.id is not None
+    return api.db.get_club_members(club.id)

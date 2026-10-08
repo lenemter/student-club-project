@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Union
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 if TYPE_CHECKING:
     from .. import Notification
@@ -14,7 +14,7 @@ def get_user_notifications(user_id: int) -> list["Notification"]:
             session.exec(
                 select(Notification)
                 .where(Notification.user_id == user_id)
-                .order_by(Notification.created_at.desc())  # type: ignore
+                .order_by(col(Notification.created_at).desc())
             ).all()
         )
 
