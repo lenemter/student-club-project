@@ -24,7 +24,12 @@ services:
     container_name: student_club_backend
     restart: always
     environment:
-      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/student_clubs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: student_clubs
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      SECRET_KEY: supersecretkey_change_me_in_production
       CORS_ORIGINS: "*"
     ports:
       - "8000:8000"

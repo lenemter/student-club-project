@@ -1,7 +1,3 @@
-from fastapi import FastAPI
+from api.main import app
 
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
+__all__ = ["app"]

@@ -34,3 +34,5 @@ env/
 
 # Postgres data
 pgdata/
+*.db
+secrets/
