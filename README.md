@@ -47,6 +47,7 @@
 
 ## Технологии
 
+### Frontend
 - [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vite.dev/) — сборка и dev-сервер
 - [React Router](https://reactrouter.com/) — клиентская маршрутизация
@@ -55,59 +56,226 @@
 - [Gravity UI Icons](https://github.com/gravity-ui/icons) — иконки
 - ESLint + typescript-eslint — проверка кода
 
-### Выбор UI-библиотеки
+### Backend
+- [Python 3.11+](https://www.python.org/)
+- [FastAPI](https://fastapi.tiangolo.com/) — веб-фреймворк для создания REST API
+- [SQLModel](https://sqlmodel.tiangolo.com/) / [SQLAlchemy 2.0](https://www.sqlalchemy.org/) — ORM и декларативные модели данных
+- [PostgreSQL](https://www.postgresql.org/) + [psycopg 3](https://www.psycopg.org/) — реляционная база данных и драйвер
+- [Pydantic v2](https://docs.pydantic.dev/) — валидация и сериализация схем запросов/ответов
+- [PyJWT](https://pyjwt.readthedocs.io/) + [bcrypt](https://pypi.org/project/bcrypt/) — авторизация по токенам JWT и безопасное хеширование паролей
+- [Uvicorn](https://www.uvicorn.org/) — ASGI-сервер
+- [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/) — контейнеризация всех сервисов
 
-Использована **HeroUI**: она построена на доступных (accessible) примитивах, содержит готовые формы, модальные окна, карточки, выпадающие списки и аватары, а единая система токенов (`--accent`, `--surface`, `--muted` и др.) в `src/globals.css` обеспечивает одинаковое оформление всех экранов. Через те же токены работает **тёмная тема**: она включается автоматически по системным настройкам.
+## Модель данных (БД)
 
-Читаемость и адаптивность обеспечиваются так:
+Реляционная схема построена на **PostgreSQL** через **SQLModel** (надстройка над **SQLAlchemy 2.0**). Все связи поддержаны первичными и внешними ключами с каскадным удалением зависимых записей (`ON DELETE CASCADE`).
 
-- сетка карточек перестраивается от одной колонки на телефоне до нескольких на широком экране;
-- контент ограничен по ширине (`max-w-*`) и имеет боковые отступы на мобильных экранах;
-- модальные окна ограничены по высоте, длинные списки прокручиваются внутри;
-- цвета берутся только из токенов темы, поэтому контраст сохраняется в светлой и тёмной теме.
+```mermaid
+erDiagram
+    USER ||--o{ CLUB : "руководит (leader_id)"
+    USER ||--o{ MEMBERSHIP : "состоит в кружках"
+    USER ||--o{ JOIN_REQUEST : "подаёт заявки"
+    USER ||--o{ NOTIFICATION : "получает"
+    USER ||--o{ ATTENDANCE_USER : "отмечается"
 
-## Запуск
+    CLUB ||--o{ MEMBERSHIP : "участники"
+    CLUB ||--o{ JOIN_REQUEST : "заявки"
+    CLUB ||--o{ ATTENDANCE_RECORD : "занятия"
 
-Требуется Node.js 20.19+ (или 22.12+) и npm.
+    ATTENDANCE_RECORD ||--o{ ATTENDANCE_USER : "присутствовавшие"
 
-```bash
-npm install
-npm run dev
+    USER {
+        int id PK
+        string email UK
+        string first_name
+        string last_name
+        string about_me
+        string avatar_url
+        string hashed_password
+    }
+
+    CLUB {
+        int id PK
+        string name
+        string description
+        string image_url
+        string schedule
+        int leader_id FK
+    }
+
+    MEMBERSHIP {
+        int id PK
+        int user_id FK
+        int club_id FK
+        datetime joined_at
+    }
+
+    JOIN_REQUEST {
+        int id PK
+        int user_id FK
+        int club_id FK
+        string status
+        datetime created_at
+    }
+
+    ATTENDANCE_RECORD {
+        int id PK
+        int club_id FK
+        datetime date
+    }
+
+    ATTENDANCE_USER {
+        int attendance_id PK,FK
+        int user_id PK,FK
+    }
+
+    NOTIFICATION {
+        int id PK
+        int user_id FK
+        string title
+        string description
+        datetime created_at
+        boolean is_read
+        string type
+    }
 ```
 
-После запуска приложение доступно по адресу, который выведет Vite (обычно <http://localhost:5173>).
+### Описание сущностей
 
-### Как пройти по приложению
+1. **`User`** (`user`) — пользователи системы (студенты и руководители). Хранит email, имя, фамилию, аватар, текст «О себе» и хеш пароля (`bcrypt`).
+2. **`Club`** (`club`) — студенческие кружки. Содержит название, описание, ссылку на обложку, расписание и идентификатор руководителя (`leader_id` -> `user.id`).
+3. **`Membership`** (`membership`) — связь участников и кружков (`user_id` -> `user.id`, `club_id` -> `club.id`).
+4. **`JoinRequest`** (`joinrequest`) — заявка на вступление студента в кружок со статусом (`pending`, `approved`, `rejected`). При одобрении руководителем автоматически создаётся запись в `membership` и уведомление студенту.
+5. **`AttendanceRecord`** (`attendancerecord`) — занятие кружка с датой проведения (`club_id` -> `club.id`, `date`).
+6. **`AttendanceUser`** (`attendanceuser`) — промежуточная таблица посещаемости (`attendance_id`, `user_id`), связывающая занятие со списком присутствовавших студентов.
+7. **`Notification`** (`notification`) — уведомления для пользователя (одобрение/отклонение заявок, новые заявки для руководителя).
 
-Бэкенда пока нет, поэтому авторизация имитируется: на экранах входа и регистрации любые корректно заполненные поля ведут на главную страницу. Текущий пользователь берётся из демонстрационных данных (`src/data/mockUsers.tsx`).
+---
 
 ## Структура проекта
 
 ```text
-src/
-├── App.tsx             # маршрутизация
-├── main.tsx            # точка входа, подключение стилей и темы
-├── theme.tsx           # переключение темы по системным настройкам
-├── globals.css         # токены темы HeroUI (светлая и тёмная)
-├── types.tsx           # типы: User, Club, Membership, JoinRequest, ...
-├── pages/              # страницы приложения
-├── components/         # переиспользуемые компоненты (шапка, карточки, модальные окна)
-└── data/               # демонстрационные данные и вспомогательные функции
-docs/
-└── screenshots/        # скриншоты экранов
+student-club-project/
+├── docker-compose.yml          # Запуск полного стека (postgres, backend, frontend)
+├── .env.example                # Шаблон переменных окружения
+├── .flake8                     # Конфигурация линтера Flake8
+├── backend/                    # Backend (FastAPI + SQLModel + PostgreSQL)
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── main.py                 # Экспорт точки входа FastAPI для uvicorn
+│   ├── seed.py                 # Скрипт наполнения тестовыми данными
+│   └── api/
+│       ├── main.py             # Инициализация FastAPI, CORS, роутеры
+│       ├── dependencies.py     # Сессии БД, JWT CurrentUserDep, права ClubLeaderAccessDep
+│       ├── utils.py            # Хеширование bcrypt, чтение секретов
+│       ├── db/
+│       │   ├── db.py           # Подключение к PostgreSQL и создание таблиц
+│       │   ├── models/         # Модели SQLModel (User, Club, Membership, ...)
+│       │   └── utils/          # CRUD-функции и бизнес-логика работы с БД
+│       ├── schemas/            # Pydantic-схемы валидации и сериализации (camelCase)
+│       └── routers/            # Эндпоинты (auth, users, clubs, memberships, ...)
+├── frontend/                   # Frontend (React 19 + HeroUI + Vite)
+│   ├── Dockerfile
+│   └── src/
+│       ├── App.tsx             # Клиентская маршрутизация
+│       ├── types.tsx           # TypeScript-типы сущностей
+│       ├── pages/              # Страницы (Home, Club, Profile, Settings, ...)
+│       └── components/         # Переиспользуемые UI-компоненты
+└── docs/
+    └── screenshots/            # Скриншоты интерфейса
 ```
 
-Модель данных (`src/types.tsx`): пользователи, кружки, членство, заявки на вступление, уведомления и записи посещаемости. Связи между сущностями заданы по идентификаторам, как в будущей базе данных.
+---
 
-## Демонстрационные данные и ограничения
+## Запуск проекта
 
-На этом этапе все данные хранятся в `src/data/*` и живут только в памяти браузера. Поэтому:
+### Вариант 1. Запуск через Docker Compose (Рекомендуемый)
 
-- изменения (заявки, отметки посещаемости, правки профиля) не сохраняются после перезагрузки страницы;
-- состояние части экранов хранится локально внутри страницы и не передаётся между экранами;
-- вход и регистрация только имитируются, проверки пользователя нет.
+Для полного запуска базы данных PostgreSQL, бэкенда и фронтенда потребуется только [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
-Эти ограничения будут сняты на следующих этапах: общее хранилище состояния, валидация форм, интеграция с API.
+1. Скопируйте файл с переменными окружения:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Запустите все сервисы:
+   ```bash
+   docker compose up --build
+   ```
+
+3. Сервисы будут доступны по адресам:
+   - **Frontend:** <http://localhost:3000>
+   - **Backend API:** <http://localhost:8000>
+   - **Интерактивная документация Swagger UI:** <http://localhost:8000/docs>
+   - **Документация ReDoc:** <http://localhost:8000/redoc>
+   - **База данных PostgreSQL:** `localhost:5432`
+
+---
+
+### Вариант 2. Локальный запуск Backend
+
+1. **Требования:** Python 3.11+ и запущенный сервер PostgreSQL.
+2. **Установка зависимостей:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+3. **Настройка переменных окружения:**
+   Создайте файл `backend/.env` на основе шаблона `backend/.env.example`:
+   ```env
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=postgrespassword
+   POSTGRES_DB=student_clubs
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+   SECRET_KEY=your_secret_key_here
+   DEBUG=False
+   CORS_ORIGINS=*
+   ```
+4. **Создание таблиц:**
+   Таблицы в базе данных создаются **автоматически** при старте приложения функцией `create_db_and_tables()` в `api/db/db.py`.
+5. **Запуск сервера разработки:**
+   ```bash
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   ```
+6. **(Опционально) Наполнение тестовыми данными:**
+   Для быстрого заполнения базы тестовыми кружками, пользователями, заявками и посещаемостью запустите сидер:
+   ```bash
+   python seed.py
+   ```
+
+---
+
+### Вариант 3. Локальный запуск Frontend
+
+1. **Требования:** Node.js 20.19+ (или 22.12+) и npm.
+2. **Установка и запуск:**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   Приложение откроется по адресу <http://localhost:5173>.
+
+---
+
+## Проверка качества кода
+
+- **Линтинг бэкенда (Flake8):**
+  ```bash
+  python -m flake8 backend
+  ```
+- **Проверка статической типизации (MyPy):**
+  ```bash
+  python -m mypy backend
+  ```
+- **Линтинг фронтенда (ESLint):**
+  ```bash
+  cd frontend
+  npm run lint
+  ```
+
+---
 
 ## Скриншоты
 
@@ -130,11 +298,5 @@ docs/
 | Главная на телефоне | `docs/screenshots/home-mobile.png` |
 | Главная в тёмной теме | `docs/screenshots/home-dark.png` |
 
-![Главная](docs/screenshots/desktop/Home.png)
-![Карточка кружка](docs/screenshots/desktop/Club.png)
-
-При последующих изменениях интерфейса скриншоты обновляются, а причины существенных изменений или упрощений фиксируются в разделе ниже.
-
-### История изменений интерфейса
-
-- _Пока без существенных изменений._
+![Главная](frontend/docs/screenshots/desktop/Home.png)
+![Карточка кружка](frontend/docs/screenshots/desktop/Club.png)
