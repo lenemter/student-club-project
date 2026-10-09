@@ -16,6 +16,8 @@ export function EditProfileForm() {
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || "");
     const [aboutMe, setAboutMe] = useState(currentUser.aboutMe || "");
 
+    const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; aboutMe?: string }>({});
+
     const avatarFallback = ((firstName[0] ?? "") + (lastName[0] ?? "")).toUpperCase() || "?";
     const profilePath = `/profile/${currentUser.id}`;
 
@@ -33,8 +35,35 @@ export function EditProfileForm() {
         }
     };
 
+    const validate = (): boolean => {
+        const newErrors: typeof errors = {};
+
+        if (!firstName.trim()) {
+            newErrors.firstName = "Введите имя";
+        } else if (firstName.trim().length < 2) {
+            newErrors.firstName = "Имя должно содержать не менее 2 символов";
+        }
+
+        if (!lastName.trim()) {
+            newErrors.lastName = "Введите фамилию";
+        } else if (lastName.trim().length < 2) {
+            newErrors.lastName = "Фамилия должна содержать не менее 2 символов";
+        }
+
+        if (aboutMe.length > ABOUT_ME_MAX_LENGTH) {
+            newErrors.aboutMe = `Длина текста не должна превышать ${ABOUT_ME_MAX_LENGTH} символов`;
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        if (!validate()) {
+            return;
+        }
 
         updateCurrentUser({
             firstName,
@@ -102,25 +131,31 @@ export function EditProfileForm() {
                         <TextField
                             name="firstName"
                             variant="secondary"
-                            isRequired
                             value={firstName}
-                            onChange={setFirstName}
+                            isInvalid={Boolean(errors.firstName)}
+                            onChange={(val) => {
+                                setFirstName(val);
+                                if (errors.firstName) setErrors((prev) => ({ ...prev, firstName: undefined }));
+                            }}
                         >
-                            <Label>Имя</Label>
+                            <Label>Имя *</Label>
                             <Input />
-                            <FieldError />
+                            {errors.firstName ? <FieldError>{errors.firstName}</FieldError> : <FieldError />}
                         </TextField>
 
                         <TextField
                             name="lastName"
                             variant="secondary"
-                            isRequired
                             value={lastName}
-                            onChange={setLastName}
+                            isInvalid={Boolean(errors.lastName)}
+                            onChange={(val) => {
+                                setLastName(val);
+                                if (errors.lastName) setErrors((prev) => ({ ...prev, lastName: undefined }));
+                            }}
                         >
-                            <Label>Фамилия</Label>
+                            <Label>Фамилия *</Label>
                             <Input />
-                            <FieldError />
+                            {errors.lastName ? <FieldError>{errors.lastName}</FieldError> : <FieldError />}
                         </TextField>
                     </div>
 
@@ -134,11 +169,21 @@ export function EditProfileForm() {
                             maxLength={ABOUT_ME_MAX_LENGTH}
                             placeholder="Курс, интересы, чем занимаетесь"
                             value={aboutMe}
-                            onChange={(e) => setAboutMe(e.target.value)}
+                            onChange={(e) => {
+                                setAboutMe(e.target.value);
+                                if (errors.aboutMe) setErrors((prev) => ({ ...prev, aboutMe: undefined }));
+                            }}
                         />
-                        <span className="text-xs text-muted self-end">
-                            {aboutMe.length}/{ABOUT_ME_MAX_LENGTH}
-                        </span>
+                        <div className="flex justify-between items-center text-xs">
+                            {errors.aboutMe ? (
+                                <span className="text-danger">{errors.aboutMe}</span>
+                            ) : (
+                                <span />
+                            )}
+                            <span className="text-muted">
+                                {aboutMe.length}/{ABOUT_ME_MAX_LENGTH}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </Card>

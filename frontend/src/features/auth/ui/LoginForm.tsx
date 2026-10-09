@@ -7,16 +7,35 @@ import { useStore } from "../../../app/providers/StoreContext";
 export function LoginForm() {
     const navigate = useNavigate();
     const { login } = useStore();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+
+    const validate = (): boolean => {
+        const newErrors: { email?: string; password?: string } = {};
+
+        const emailTrimmed = email.trim();
+        if (!emailTrimmed) {
+            newErrors.email = "Введите email";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+            newErrors.email = "Некорректный формат email (например, name@example.com)";
+        }
+
+        if (!password) {
+            newErrors.password = "Введите пароль";
+        } else if (password.length < 6) {
+            newErrors.password = "Пароль должен содержать не менее 6 символов";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setError(null);
 
-        if (!email.trim() || !password.trim()) {
-            setError("Пожалуйста, заполните все поля");
+        if (!validate()) {
             return;
         }
 
@@ -24,7 +43,9 @@ export function LoginForm() {
         if (success) {
             navigate("/");
         } else {
-            setError("Пользователь с таким email не найден. Проверьте адрес или зарегистрируйтесь.");
+            setErrors({
+                general: "Пользователь с таким email не найден. Зарегистрируйтесь или проверьте адрес.",
+            });
         }
     }
 
@@ -35,9 +56,9 @@ export function LoginForm() {
                 <Typography type="body">Войдите, чтобы управлять своими кружками</Typography>
             </div>
 
-            {error && (
+            {errors.general && (
                 <div className="p-3 text-sm rounded-xl bg-danger-soft text-danger border border-danger/20">
-                    {error}
+                    {errors.general}
                 </div>
             )}
 
@@ -46,26 +67,30 @@ export function LoginForm() {
                 variant="secondary"
                 type="email"
                 autoComplete="email"
-                isRequired
                 value={email}
+                isInvalid={Boolean(errors.email)}
                 onChange={(val) => {
                     setEmail(val);
-                    setError(null);
+                    if (errors.email || errors.general) {
+                        setErrors((prev) => ({ ...prev, email: undefined, general: undefined }));
+                    }
                 }}
             >
                 <Label>Email</Label>
                 <Input placeholder="example@example.com" />
-                <FieldError />
+                {errors.email ? <FieldError>{errors.email}</FieldError> : <FieldError />}
             </TextField>
 
             <PasswordField
                 label="Пароль"
                 autoComplete="current-password"
-                isRequired
                 value={password}
+                errorMessage={errors.password}
                 onChange={(val) => {
                     setPassword(val);
-                    setError(null);
+                    if (errors.password || errors.general) {
+                        setErrors((prev) => ({ ...prev, password: undefined, general: undefined }));
+                    }
                 }}
             />
 

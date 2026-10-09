@@ -5,13 +5,19 @@ import { useState } from "react";
 export interface PasswordFieldProps extends Omit<TextFieldProps, "children" | "type"> {
     label: string;
     placeholder?: string;
+    errorMessage?: string;
 }
 
-export function PasswordField({ label, onChange, ...props }: PasswordFieldProps) {
+export function PasswordField({ label, onChange, errorMessage, ...props }: PasswordFieldProps) {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-        <TextField variant="secondary" onChange={onChange} {...props}>
+        <TextField
+            variant="secondary"
+            onChange={onChange}
+            isInvalid={Boolean(errorMessage) || props.isInvalid}
+            {...props}
+        >
             <Label>{label}</Label>
             <InputGroup>
                 <InputGroup.Input type={isVisible ? "text" : "password"} placeholder="••••••••" />
@@ -27,7 +33,7 @@ export function PasswordField({ label, onChange, ...props }: PasswordFieldProps)
                     </Button>
                 </InputGroup.Suffix>
             </InputGroup>
-            <FieldError />
+            {errorMessage ? <FieldError>{errorMessage}</FieldError> : <FieldError />}
         </TextField>
     );
 }

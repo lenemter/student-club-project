@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Avatar, Button, Card, Typography } from "@heroui/react";
 import { Calendar, Check, Xmark } from "@gravity-ui/icons";
-import { HeaderBar } from "../../shared/ui";
+import { HeaderBar, ErrorState, EmptyState } from "../../shared/ui";
 import { AvatarGroup, MembersModal } from "../../entities/user";
 import { AttendanceModal } from "../../features/manage-attendance";
 import type { Club, User } from "../../shared/types";
@@ -11,12 +11,12 @@ import {
     getUserAvatarFallback,
     getUserFullName,
 } from "../../shared/lib/formatters";
-import { NotFoundPage } from "../not-found/NotFoundPage";
 import { useStore } from "../../app/providers/StoreContext";
 
 export function ClubPage() {
     const { id } = useParams<{ id: string }>();
     const clubId = Number(id);
+    const navigate = useNavigate();
 
     const {
         currentUser,
@@ -48,7 +48,20 @@ export function ClubPage() {
     };
 
     if (!club || !leader) {
-        return <NotFoundPage message="Кружок не найден" />;
+        return (
+            <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
+                <div className="w-full max-w-5xl flex flex-col gap-8">
+                    <div className="w-full flex justify-end">
+                        <HeaderBar />
+                    </div>
+                    <ErrorState
+                        title="Кружок не найден"
+                        message="Кружок с таким идентификатором не существует или был удален."
+                        action={<Button onPress={() => navigate("/")}>Вернуться на главную</Button>}
+                    />
+                </div>
+            </main>
+        );
     }
 
     const members = getClubMembers(club.id);
@@ -186,7 +199,21 @@ export function ClubPage() {
                             </div>
 
                             {attendanceList.length === 0 ? (
-                                <Typography className="text-muted">Занятия ещё не фиксировались</Typography>
+                                <EmptyState
+                                    title="Занятия ещё не фиксировались"
+                                    description={
+                                        isLeader
+                                            ? "Отметьте первое занятие кружка и выберите присутствовавших участников."
+                                            : "Руководитель кружка ещё не создавал отметок о проведении занятий."
+                                    }
+                                    action={
+                                        isLeader ? (
+                                            <Button size="sm" onPress={() => setIsAttendanceModalOpen(true)}>
+                                                Отметить занятие
+                                            </Button>
+                                        ) : undefined
+                                    }
+                                />
                             ) : (
                                 <div className="flex flex-col gap-3">
                                     {attendanceList.map((rec) => (

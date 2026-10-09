@@ -21,8 +21,19 @@ export function HomePage() {
                     </div>
                 </div>
 
-                <ClubCardGrid title="Мои кружки" clubs={myClubs} />
-                <ClubCardGrid title="Другие кружки" clubs={otherClubs} />
+                <ClubCardGrid
+                    title="Мои кружки"
+                    clubs={myClubs}
+                    emptyTitle="Вы пока не состоите в кружках"
+                    emptyDescription="Создайте свой собственный кружок с помощью кнопки выше или подайте заявку на вступление."
+                />
+
+                <ClubCardGrid
+                    title="Другие кружки"
+                    clubs={otherClubs}
+                    emptyTitle="Нет доступных кружков"
+                    emptyDescription="Вы уже состоите или являетесь руководителем всех доступных кружков."
+                />
             </div>
         </main>
     );
