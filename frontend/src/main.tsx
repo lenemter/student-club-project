@@ -1,9 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
+import App from "./app/App";
 import "@fontsource-variable/inter";
-import "./globals.css";
-import { initTheme } from "./theme.tsx";
+import "./app/globals.css";
+import { initTheme } from "./app/theme";
 
 initTheme();
 
