@@ -112,4 +112,3 @@ async def upload_existing_club_image(
 
     image_url = f"/static/clubs/{filename}"
     return api.db.update_club(session, club, {"image_url": image_url})
-
