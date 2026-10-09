@@ -1,6 +1,6 @@
 fastapi[standard]>=0.142.2
 uvicorn[standard]>=0.54.0
-sqlmodel>=0.0.47
+sqlmodel>=0.0.48
 bcrypt>=5.0.0
 pyjwt>=2.15.1
 python-dotenv>=1.0.0
