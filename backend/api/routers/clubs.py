@@ -1,8 +1,13 @@
-from fastapi import APIRouter, status
+import os
+import shutil
+import uuid
+
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
 import api.db
 import api.dependencies
 import api.schemas
+import api.utils
 
 router = APIRouter(prefix="/clubs", tags=["clubs"])
 
@@ -56,3 +61,55 @@ async def delete_club(
 async def get_club_members(club: api.dependencies.ClubDep):
     assert club.id is not None
     return api.db.get_club_members(club.id)
+
+
+@router.post("/upload-image", response_model=dict[str, str])
+async def upload_club_image(
+    current_user: api.dependencies.CurrentUserDep,
+    file: UploadFile = File(...),
+):
+    allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file format. Allowed: JPEG, PNG, WebP, GIF",
+        )
+
+    ext = os.path.splitext(file.filename or "")[1] or ".png"
+    filename = f"{uuid.uuid4().hex}{ext}"
+    clubs_dir = os.path.join(api.utils.UPLOAD_DIR, "clubs")
+    os.makedirs(clubs_dir, exist_ok=True)
+    filepath = os.path.join(clubs_dir, filename)
+
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    image_url = f"/static/clubs/{filename}"
+    return {"imageUrl": image_url, "image_url": image_url}
+
+
+@router.post("/{club_id}/image", response_model=api.schemas.ClubPublic)
+async def upload_existing_club_image(
+    club: api.dependencies.ClubLeaderAccessDep,
+    session: api.dependencies.SessionDep,
+    file: UploadFile = File(...),
+):
+    allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file format. Allowed: JPEG, PNG, WebP, GIF",
+        )
+
+    ext = os.path.splitext(file.filename or "")[1] or ".png"
+    filename = f"{uuid.uuid4().hex}{ext}"
+    clubs_dir = os.path.join(api.utils.UPLOAD_DIR, "clubs")
+    os.makedirs(clubs_dir, exist_ok=True)
+    filepath = os.path.join(clubs_dir, filename)
+
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    image_url = f"/static/clubs/{filename}"
+    return api.db.update_club(session, club, {"image_url": image_url})
+

@@ -1,6 +1,6 @@
-import { Check, Persons } from "@gravity-ui/icons";
+import { Check, Persons, Picture, TrashBin } from "@gravity-ui/icons";
 import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useStore, type CreateClubDto } from "../../../app/providers/StoreContext";
 
 export interface NewClubButtonProps {
@@ -9,16 +9,33 @@ export interface NewClubButtonProps {
 
 export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
     const { createClub } = useStore();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
 
     const [errors, setErrors] = useState<{
         name?: string;
         schedule?: string;
         description?: string;
     }>({});
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImageUrl(URL.createObjectURL(file));
+    };
+
+    const handleRemoveImage = () => {
+        setImageUrl("");
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
 
     const validate = (): boolean => {
         const newErrors: typeof errors = {};
@@ -58,6 +75,7 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
             name: name.trim(),
             description: description.trim(),
             schedule: schedule.trim(),
+            imageUrl: imageUrl || undefined,
         };
 
         createClub(clubData);
@@ -69,6 +87,10 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
         setName("");
         setDescription("");
         setSchedule("");
+        setImageUrl("");
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
         setErrors({});
         setIsOpen(false);
     }
@@ -76,6 +98,13 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
     const handleOpenChange = (open: boolean) => {
         setIsOpen(open);
         if (!open) {
+            setName("");
+            setDescription("");
+            setSchedule("");
+            setImageUrl("");
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
             setErrors({});
         }
     };
@@ -102,6 +131,60 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
                         </Modal.Header>
                         <Modal.Body>
                             <Form className="flex flex-col gap-3" onSubmit={onFormSubmit}>
+                                <div className="flex flex-col gap-2">
+                                    <Label>Обложка кружка</Label>
+                                    <div className="flex items-center gap-4">
+                                        {imageUrl ? (
+                                            <img
+                                                src={imageUrl}
+                                                alt="Обложка кружка"
+                                                className="aspect-square size-16 rounded-2xl object-cover border border-border"
+                                            />
+                                        ) : (
+                                            <div className="aspect-square size-16 rounded-2xl bg-surface border border-dashed border-border flex items-center justify-center text-muted">
+                                                <Picture className="size-6 text-muted" />
+                                            </div>
+                                        )}
+
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleFileChange}
+                                        />
+
+                                        <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    onPress={() => fileInputRef.current?.click()}
+                                                >
+                                                    {imageUrl ? "Сменить фото" : "Загрузить фото"}
+                                                </Button>
+
+                                                {imageUrl && (
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        isIconOnly
+                                                        onPress={handleRemoveImage}
+                                                        aria-label="Удалить фото"
+                                                    >
+                                                        <TrashBin className="size-4 text-danger" />
+                                                    </Button>
+                                                )}
+                                            </div>
+                                            <span className="text-xs text-muted">
+                                                JPG, PNG или WEBP (необязательно)
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <TextField
                                     name="name"
                                     variant="secondary"

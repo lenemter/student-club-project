@@ -29,6 +29,7 @@ app.add_middleware(
 
 UPLOAD_DIR = api.utils.UPLOAD_DIR
 os.makedirs(os.path.join(UPLOAD_DIR, "avatars"), exist_ok=True)
+os.makedirs(os.path.join(UPLOAD_DIR, "clubs"), exist_ok=True)
 app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
 
 app.include_router(api.routers.auth_router)
