@@ -312,24 +312,18 @@ student-club-project/
 
 ## Скриншоты
 
-Скриншоты реализованных экранов лежат в [`docs/screenshots`](docs/screenshots).
+Скриншоты реализованных экранов лежат в [`frontend/docs/screenshots`](frontend/docs/screenshots).
 
-| Экран | Файл |
-|---|---|
-| Вход | `docs/screenshots/login.png` |
-| Регистрация | `docs/screenshots/signup.png` |
-| Главная | `docs/screenshots/home.png` |
-| Карточка кружка (участник) | `docs/screenshots/club-member.png` |
-| Карточка кружка (руководитель) | `docs/screenshots/club-leader.png` |
-| Создание кружка | `docs/screenshots/new-club-modal.png` |
-| Отметка посещаемости | `docs/screenshots/attendance-modal.png` |
-| Список участников | `docs/screenshots/members-modal.png` |
-| Профиль | `docs/screenshots/profile.png` |
-| Настройки | `docs/screenshots/settings.png` |
-| Уведомления | `docs/screenshots/notifications.png` |
-| Страница 404 | `docs/screenshots/not-found.png` |
-| Главная на телефоне | `docs/screenshots/home-mobile.png` |
-| Главная в тёмной теме | `docs/screenshots/home-dark.png` |
+| Экран | Десктоп | Мобильная версия |
+|---|---|---|
+| Главная | `frontend/docs/screenshots/desktop/Home.png` | `frontend/docs/screenshots/mobile/Home.png` |
+| Карточка кружка | `frontend/docs/screenshots/desktop/Club.png` | `frontend/docs/screenshots/mobile/Club.png` |
+| Создание кружка | `frontend/docs/screenshots/desktop/CreateClubPage.png` | — |
+| Вход | `frontend/docs/screenshots/desktop/LogIn.png` | `frontend/docs/screenshots/mobile/LogIn.png` |
+| Регистрация | `frontend/docs/screenshots/desktop/SignUp.png` | `frontend/docs/screenshots/mobile/SignUp.png` |
+| Мой профиль | `frontend/docs/screenshots/desktop/MyProfile.png` | `frontend/docs/screenshots/mobile/MyProfile.png` |
+| Чужой профиль | `frontend/docs/screenshots/desktop/OtherProfile.png` | `frontend/docs/screenshots/mobile/OtherProfile.png` |
+| Настройки | `frontend/docs/screenshots/desktop/Settings.png` | `frontend/docs/screenshots/mobile/Settings.png` |
 
 ![Главная](frontend/docs/screenshots/desktop/Home.png)
 ![Карточка кружка](frontend/docs/screenshots/desktop/Club.png)
