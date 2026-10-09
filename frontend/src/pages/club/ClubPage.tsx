@@ -3,40 +3,39 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Avatar, Button, Card, Typography } from "@heroui/react";
 import { Calendar, Check, Xmark } from "@gravity-ui/icons";
 import { HeaderBar } from "../../shared/ui";
-import { AvatarGroup, MembersModal, getUserById, currentUser } from "../../entities/user";
-import { mockClubs, mockMemberships, getClubMembers } from "../../entities/club";
-import { mockAttendance } from "../../entities/attendance";
-import { mockJoinRequests } from "../../entities/join-request";
+import { AvatarGroup, MembersModal } from "../../entities/user";
 import { AttendanceModal } from "../../features/manage-attendance";
-import type { Club, User, AttendanceRecord, JoinRequest } from "../../shared/types";
+import type { Club, User } from "../../shared/types";
 import {
     getMemberCountText,
     getUserAvatarFallback,
     getUserFullName,
 } from "../../shared/lib/formatters";
 import { NotFoundPage } from "../not-found/NotFoundPage";
+import { useStore } from "../../app/providers/StoreContext";
 
 export function ClubPage() {
     const { id } = useParams<{ id: string }>();
     const clubId = Number(id);
 
-    const club: Club | undefined = mockClubs.find((c) => c.id === clubId);
-    const leader: User | undefined = club ? getUserById(club.leaderId) : undefined;
+    const {
+        currentUser,
+        getClubById,
+        getUserById,
+        getClubMembers,
+        getClubAttendance,
+        getClubPendingRequests,
+        getUserRequestStatusForClub,
+        requestToJoinClub,
+        cancelJoinRequest,
+        leaveClub,
+        approveJoinRequest,
+        rejectJoinRequest,
+        addAttendanceRecord,
+    } = useStore();
 
-    const [members, setMembers] = useState<User[]>(club ? getClubMembers(club) : []);
-    const [attendanceList, setAttendanceList] = useState<AttendanceRecord[]>(
-        mockAttendance.filter((a) => a.clubId === clubId),
-    );
-    const [requests, setRequests] = useState<JoinRequest[]>(
-        mockJoinRequests.filter((r) => r.clubId === clubId && r.status === "pending"),
-    );
-    const [myRequestStatus, setMyRequestStatus] = useState<"none" | "pending" | "approved">(
-        mockJoinRequests.find((r) => r.clubId === clubId && r.userId === currentUser.id)?.status === "pending"
-            ? "pending"
-            : mockMemberships.some((m) => m.clubId === clubId && m.userId === currentUser.id)
-              ? "approved"
-              : "none",
-    );
+    const club: Club | undefined = getClubById(clubId);
+    const leader: User | undefined = club ? getUserById(club.leaderId) : undefined;
 
     const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
@@ -52,41 +51,35 @@ export function ClubPage() {
         return <NotFoundPage message="Кружок не найден" />;
     }
 
+    const members = getClubMembers(club.id);
+    const attendanceList = getClubAttendance(club.id);
+    const requests = getClubPendingRequests(club.id);
+    const myRequestStatus = getUserRequestStatusForClub(club.id);
     const isLeader = club.leaderId === currentUser.id;
 
     const handleJoin = () => {
-        setMyRequestStatus("pending");
+        requestToJoinClub(club.id);
     };
 
     const handleCancelRequest = () => {
-        setMyRequestStatus("none");
+        cancelJoinRequest(club.id);
     };
 
     const handleLeave = () => {
-        setMembers(members.filter((m) => m.id !== currentUser.id));
-        setMyRequestStatus("none");
+        leaveClub(club.id);
     };
 
-    const handleApproveRequest = (reqId: number, userId: number) => {
-        setRequests(requests.filter((r) => r.id !== reqId));
-        const userToAdd = getUserById(userId);
-        if (userToAdd && !members.some((m) => m.id === userId)) {
-            setMembers([...members, userToAdd]);
-        }
+    const handleApproveRequest = (reqId: number) => {
+        approveJoinRequest(reqId);
     };
 
     const handleRejectRequest = (reqId: number) => {
-        setRequests(requests.filter((r) => r.id !== reqId));
+        rejectJoinRequest(reqId);
     };
 
     const handleSaveAttendance = () => {
-        const newRecord: AttendanceRecord = {
-            id: Date.now(),
-            clubId,
-            date: new Date().toISOString(),
-            attendedUserIds: selectedUserIds,
-        };
-        setAttendanceList([newRecord, ...attendanceList]);
+        if (selectedUserIds.length === 0) return;
+        addAttendanceRecord(club.id, selectedUserIds);
         setIsAttendanceModalOpen(false);
         setSelectedUserIds([]);
     };
@@ -161,7 +154,7 @@ export function ClubPage() {
                                                         className="bg-success text-success-foreground"
                                                         isIconOnly
                                                         aria-label="Принять заявку"
-                                                        onPress={() => handleApproveRequest(req.id, req.userId)}
+                                                        onPress={() => handleApproveRequest(req.id)}
                                                     >
                                                         <Check />
                                                     </Button>

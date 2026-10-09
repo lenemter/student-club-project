@@ -1,11 +1,12 @@
 import { ArrowRightFromSquare, ChevronDown, Gear } from "@gravity-ui/icons";
 import { Dropdown, Button, Avatar, Typography, Label, Separator } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
-import { currentUser } from "../model/mockUsers";
 import { getUserAvatarFallback, getUserFullName } from "../../../shared/lib/formatters";
+import { useStore } from "../../../app/providers/StoreContext";
 
 export function ProfileButton() {
     const navigate = useNavigate();
+    const { currentUser } = useStore();
 
     return (
         <Dropdown>

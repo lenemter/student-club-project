@@ -1,14 +1,16 @@
 import { Avatar, Typography } from "@heroui/react";
 import { useParams } from "react-router-dom";
-import { ClubCardGrid, getUserClubs } from "../../entities/club";
+import { ClubCardGrid } from "../../entities/club";
 import { HeaderBar } from "../../shared/ui";
-import { getUserById, currentUser } from "../../entities/user";
 import { getUserAvatarFallback, getUserFullName } from "../../shared/lib/formatters";
 import type { User } from "../../shared/types";
 import { NotFoundPage } from "../not-found/NotFoundPage";
+import { useStore } from "../../app/providers/StoreContext";
 
 export function ProfilePage() {
     const { id } = useParams<{ id: string }>();
+    const { currentUser, getUserById, getUserClubs } = useStore();
+
     const user: User | undefined = getUserById(Number(id));
 
     if (!user) {
@@ -16,6 +18,7 @@ export function ProfilePage() {
     }
 
     const isOwn = user.id === currentUser.id;
+    const userClubs = getUserClubs(user.id);
 
     return (
         <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
@@ -35,7 +38,7 @@ export function ProfilePage() {
                     </div>
                 </div>
 
-                <ClubCardGrid title={isOwn ? "Мои кружки" : "Кружки участника"} clubs={getUserClubs(user.id)} />
+                <ClubCardGrid title={isOwn ? "Мои кружки" : "Кружки участника"} clubs={userClubs} />
             </div>
         </main>
     );

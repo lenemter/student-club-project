@@ -2,15 +2,30 @@ import { Button, FieldError, Form, Input, Label, TextField, Typography } from "@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { PasswordField } from "../../../shared/ui/PasswordField";
+import { useStore } from "../../../app/providers/StoreContext";
 
 export function LoginForm() {
     const navigate = useNavigate();
+    const { login } = useStore();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        navigate("/");
+        setError(null);
+
+        if (!email.trim() || !password.trim()) {
+            setError("Пожалуйста, заполните все поля");
+            return;
+        }
+
+        const success = login(email);
+        if (success) {
+            navigate("/");
+        } else {
+            setError("Пользователь с таким email не найден. Проверьте адрес или зарегистрируйтесь.");
+        }
     }
 
     return (
@@ -20,6 +35,12 @@ export function LoginForm() {
                 <Typography type="body">Войдите, чтобы управлять своими кружками</Typography>
             </div>
 
+            {error && (
+                <div className="p-3 text-sm rounded-xl bg-danger-soft text-danger border border-danger/20">
+                    {error}
+                </div>
+            )}
+
             <TextField
                 name="email"
                 variant="secondary"
@@ -27,7 +48,10 @@ export function LoginForm() {
                 autoComplete="email"
                 isRequired
                 value={email}
-                onChange={setEmail}
+                onChange={(val) => {
+                    setEmail(val);
+                    setError(null);
+                }}
             >
                 <Label>Email</Label>
                 <Input placeholder="example@example.com" />
@@ -39,7 +63,10 @@ export function LoginForm() {
                 autoComplete="current-password"
                 isRequired
                 value={password}
-                onChange={setPassword}
+                onChange={(val) => {
+                    setPassword(val);
+                    setError(null);
+                }}
             />
 
             <Button type="submit" size="lg" className="mt-2">

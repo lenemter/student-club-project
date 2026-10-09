@@ -2,8 +2,8 @@ import { Avatar, Button, Card } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import type { Club, User } from "../../../shared/types";
 import { getMemberCountText, getUserAvatarFallback, getUserFullName } from "../../../shared/lib/formatters";
-import { getUserById, fallbackUser } from "../../user/model/mockUsers";
-import { getClubMembers } from "../lib/clubHelpers";
+import { fallbackUser } from "../../user/model/mockUsers";
+import { useStore } from "../../../app/providers/StoreContext";
 
 export interface ClubCardProps {
     club: Club;
@@ -11,8 +11,10 @@ export interface ClubCardProps {
 
 export function ClubCard({ club }: ClubCardProps) {
     const navigate = useNavigate();
+    const { getUserById, getClubMembers } = useStore();
 
     const leader: User = getUserById(club.leaderId) ?? fallbackUser;
+    const membersCount = getClubMembers(club.id).length;
 
     return (
         <Button
@@ -30,7 +32,7 @@ export function ClubCard({ club }: ClubCardProps) {
 
                 <Card.Header>
                     <Card.Title>{club.name}</Card.Title>
-                    <Card.Description>{getMemberCountText(getClubMembers(club).length)}</Card.Description>
+                    <Card.Description>{getMemberCountText(membersCount)}</Card.Description>
                 </Card.Header>
 
                 <Card.Footer className="flex gap-2">

@@ -2,17 +2,40 @@ import { Button, FieldError, Form, Input, Label, TextField, Typography } from "@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { PasswordField } from "../../../shared/ui/PasswordField";
+import { useStore } from "../../../app/providers/StoreContext";
 
 export function SignUpForm() {
     const navigate = useNavigate();
+    const { signup } = useStore();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        setError(null);
+
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password) {
+            setError("Пожалуйста, заполните все обязательные поля");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("Пароли не совпадают");
+            return;
+        }
+
+        signup({
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: email.trim(),
+            aboutMe: "Студент",
+            avatarUrl: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/green.jpg",
+        });
+
         navigate("/");
     }
 
@@ -25,12 +48,21 @@ export function SignUpForm() {
                 </Typography>
             </div>
 
+            {error && (
+                <div className="p-3 text-sm rounded-xl bg-danger-soft text-danger border border-danger/20">
+                    {error}
+                </div>
+            )}
+
             <TextField
                 name="firstName"
                 variant="secondary"
                 isRequired
                 value={firstName}
-                onChange={setFirstName}
+                onChange={(val) => {
+                    setFirstName(val);
+                    setError(null);
+                }}
             >
                 <Label>Имя</Label>
                 <Input placeholder="Иван" />
@@ -42,7 +74,10 @@ export function SignUpForm() {
                 variant="secondary"
                 isRequired
                 value={lastName}
-                onChange={setLastName}
+                onChange={(val) => {
+                    setLastName(val);
+                    setError(null);
+                }}
             >
                 <Label>Фамилия</Label>
                 <Input placeholder="Петров" />
@@ -56,7 +91,10 @@ export function SignUpForm() {
                 autoComplete="email"
                 isRequired
                 value={email}
-                onChange={setEmail}
+                onChange={(val) => {
+                    setEmail(val);
+                    setError(null);
+                }}
             >
                 <Label>Email</Label>
                 <Input placeholder="example@example.com" />
@@ -68,7 +106,10 @@ export function SignUpForm() {
                 autoComplete="new-password"
                 isRequired
                 value={password}
-                onChange={setPassword}
+                onChange={(val) => {
+                    setPassword(val);
+                    setError(null);
+                }}
             />
 
             <PasswordField
@@ -76,7 +117,10 @@ export function SignUpForm() {
                 autoComplete="new-password"
                 isRequired
                 value={confirmPassword}
-                onChange={setConfirmPassword}
+                onChange={(val) => {
+                    setConfirmPassword(val);
+                    setError(null);
+                }}
                 validate={(value) => (value !== password ? "Пароли не совпадают." : null)}
             />
 

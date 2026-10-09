@@ -1,10 +1,15 @@
 import { Typography } from "@heroui/react";
-import { ClubCardGrid, getUserClubs, getJoinableClubs } from "../../entities/club";
+import { ClubCardGrid } from "../../entities/club";
 import { HeaderBar } from "../../shared/ui";
-import { currentUser } from "../../entities/user";
 import { NewClubButton } from "../../features/create-club";
+import { useStore } from "../../app/providers/StoreContext";
 
 export function HomePage() {
+    const { currentUser, getUserClubs, getJoinableClubs } = useStore();
+
+    const myClubs = getUserClubs(currentUser.id);
+    const otherClubs = getJoinableClubs();
+
     return (
         <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
             <div className="w-full max-w-5xl flex flex-col gap-8">
@@ -16,8 +21,8 @@ export function HomePage() {
                     </div>
                 </div>
 
-                <ClubCardGrid title="Мои кружки" clubs={getUserClubs(currentUser.id)} />
-                <ClubCardGrid title="Другие кружки" clubs={getJoinableClubs()} />
+                <ClubCardGrid title="Мои кружки" clubs={myClubs} />
+                <ClubCardGrid title="Другие кружки" clubs={otherClubs} />
             </div>
         </main>
     );

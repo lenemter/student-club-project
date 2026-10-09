@@ -1,12 +1,14 @@
 import { Check, Persons } from "@gravity-ui/icons";
 import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react";
 import { useState } from "react";
+import { useStore, type CreateClubDto } from "../../../app/providers/StoreContext";
 
 export interface NewClubButtonProps {
-    onClubCreated?: (newClub: { name: string; description: string; schedule: string }) => void;
+    onClubCreated?: (newClub: CreateClubDto) => void;
 }
 
 export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
+    const { createClub } = useStore();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -15,8 +17,20 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
     function onFormSubmit(e: React.FormEvent) {
         e.preventDefault();
 
+        if (!name.trim() || !schedule.trim()) {
+            return;
+        }
+
+        const clubData: CreateClubDto = {
+            name: name.trim(),
+            description: description.trim(),
+            schedule: schedule.trim(),
+        };
+
+        createClub(clubData);
+
         if (onClubCreated) {
-            onClubCreated({ name, description, schedule });
+            onClubCreated(clubData);
         }
 
         setName("");

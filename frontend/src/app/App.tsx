@@ -8,6 +8,7 @@ import {
     SettingsPage,
     NotFoundPage,
 } from "../pages";
+import { StoreProvider } from "./providers";
 
 const router = createBrowserRouter([
     { path: "/", element: <HomePage /> },
@@ -20,7 +21,11 @@ const router = createBrowserRouter([
 ]);
 
 export function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <StoreProvider>
+            <RouterProvider router={router} />
+        </StoreProvider>
+    );
 }
 
 export default App;

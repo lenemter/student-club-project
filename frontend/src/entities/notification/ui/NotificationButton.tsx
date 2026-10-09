@@ -1,6 +1,7 @@
 import type { Notification } from "../../../shared/types";
 import { Bell, CircleCheck, CircleInfo, TriangleExclamation } from "@gravity-ui/icons";
 import { Badge, Button, Dropdown, Label } from "@heroui/react";
+import { useStore } from "../../../app/providers/StoreContext";
 
 const notificationIcons = {
     success: { icon: CircleCheck, color: "text-success" },
@@ -13,6 +14,7 @@ export interface NotificationButtonProps {
 }
 
 export function NotificationButton({ notifications }: NotificationButtonProps) {
+    const { markNotificationAsRead } = useStore();
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 
     return (
@@ -27,7 +29,14 @@ export function NotificationButton({ notifications }: NotificationButtonProps) {
             </Button>
 
             <Dropdown.Popover className="max-w-72.5" placement="bottom">
-                <Dropdown.Menu>
+                <Dropdown.Menu
+                    onAction={(key) => {
+                        const id = Number(key);
+                        if (!isNaN(id)) {
+                            markNotificationAsRead(id);
+                        }
+                    }}
+                >
                     <Dropdown.Section>
                         {notifications.length === 0 ? (
                             <Dropdown.Item id="empty" textValue="Нет уведомлений" isDisabled>
@@ -41,7 +50,9 @@ export function NotificationButton({ notifications }: NotificationButtonProps) {
                                         key={notification.id}
                                         id={notification.id}
                                         textValue={notification.title}
-                                        className="flex flex-row items-center gap-3"
+                                        className={`flex flex-row items-center gap-3 ${
+                                            notification.isRead ? "opacity-60" : "font-medium"
+                                        }`}
                                     >
                                         <Icon className={`size-5 mt-0.5 shrink-0 ${color}`} />
                                         <div className="flex flex-col gap-1">

@@ -2,12 +2,13 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Card, FieldError, Form, Input, Label, TextArea, TextField, Typography } from "@heroui/react";
 import { TrashBin } from "@gravity-ui/icons";
-import { currentUser } from "../../../entities/user";
+import { useStore } from "../../../app/providers/StoreContext";
 
 const ABOUT_ME_MAX_LENGTH = 200;
 
 export function EditProfileForm() {
     const navigate = useNavigate();
+    const { currentUser, updateCurrentUser } = useStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [firstName, setFirstName] = useState(currentUser.firstName);
@@ -35,10 +36,12 @@ export function EditProfileForm() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        currentUser.firstName = firstName.trim();
-        currentUser.lastName = lastName.trim();
-        currentUser.avatarUrl = avatarUrl;
-        currentUser.aboutMe = aboutMe.trim();
+        updateCurrentUser({
+            firstName,
+            lastName,
+            avatarUrl,
+            aboutMe,
+        });
 
         navigate(profilePath);
     }
