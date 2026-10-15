@@ -8,6 +8,7 @@ import { mockAttendance as initialAttendance } from "../../entities/attendance/m
 import { mockNotifications as initialNotifications } from "../../entities/notification/model/mockNotifications";
 import { StoreContext, type CreateClubDto, type UpdateProfileDto } from "./StoreContext";
 import {
+    createAttendanceRecordApi,
     createClubApi,
     createJoinRequestApi,
     deleteClubApi,
@@ -21,10 +22,12 @@ import {
     getUsersApi,
     loginApi,
     logoutApi,
+    markNotificationReadApi,
     registerApi,
     removeMemberApi,
     updateClubApi,
     updateJoinRequestStatusApi,
+    updateProfileApi,
 } from "../../shared/lib";
 
 const STORAGE_KEY_PREFIX = "student_clubs_";
@@ -262,17 +265,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
 
-    const updateCurrentUser = (data: UpdateProfileDto): void => {
-        const updated: User = {
-            ...currentUser,
-            firstName: data.firstName.trim(),
-            lastName: data.lastName.trim(),
-            aboutMe: data.aboutMe.trim(),
-            avatarUrl: data.avatarUrl,
-        };
-
-        setCurrentUser(updated);
-        setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+    const updateCurrentUser = async (data: UpdateProfileDto): Promise<void> => {
+        try {
+            const updated = await updateProfileApi({
+                firstName: data.firstName.trim(),
+                lastName: data.lastName.trim(),
+                aboutMe: data.aboutMe.trim(),
+                avatarUrl: data.avatarUrl,
+            });
+            setCurrentUser(updated);
+            setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+        } catch {
+            const updated: User = {
+                ...currentUser,
+                firstName: data.firstName.trim(),
+                lastName: data.lastName.trim(),
+                aboutMe: data.aboutMe.trim(),
+                avatarUrl: data.avatarUrl,
+            };
+            setCurrentUser(updated);
+            setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+        }
     };
 
     const login = async (email: string, password?: string): Promise<boolean> => {
@@ -415,19 +428,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const addAttendanceRecord = (clubId: number, attendedUserIds: number[]): AttendanceRecord => {
-        const record: AttendanceRecord = {
-            id: Date.now(),
-            clubId,
-            date: new Date().toISOString(),
-            attendedUserIds,
-        };
-
-        setAttendanceRecords((prev) => [record, ...prev]);
-        return record;
+    const addAttendanceRecord = async (
+        clubId: number,
+        attendedUserIds: number[],
+    ): Promise<AttendanceRecord> => {
+        try {
+            const record = await createAttendanceRecordApi(clubId, attendedUserIds);
+            setAttendanceRecords((prev) => [record, ...prev]);
+            return record;
+        } catch {
+            const record: AttendanceRecord = {
+                id: Date.now(),
+                clubId,
+                date: new Date().toISOString(),
+                attendedUserIds,
+            };
+            setAttendanceRecords((prev) => [record, ...prev]);
+            return record;
+        }
     };
 
-    const markNotificationAsRead = (notificationId: number): void => {
+    const markNotificationAsRead = async (notificationId: number): Promise<void> => {
+        try {
+            await markNotificationReadApi(notificationId);
+        } catch {
+            // Ignore error
+        }
         setNotifications((prev) =>
             prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n)),
         );

@@ -91,9 +91,9 @@ export function ClubPage() {
         await rejectJoinRequest(reqId);
     };
 
-    const handleSaveAttendance = () => {
+    const handleSaveAttendance = async () => {
         if (selectedUserIds.length === 0) return;
-        addAttendanceRecord(club.id, selectedUserIds);
+        await addAttendanceRecord(club.id, selectedUserIds);
         setIsAttendanceModalOpen(false);
         setSelectedUserIds([]);
     };

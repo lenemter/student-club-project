@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Card, FieldError, Form, Input, Label, TextArea, TextField, Typography } from "@heroui/react";
 import { TrashBin } from "@gravity-ui/icons";
 import { useStore } from "../../../app/providers/StoreContext";
+import { uploadAvatarApi } from "../../../shared/lib";
 
 const ABOUT_ME_MAX_LENGTH = 200;
 
@@ -15,6 +16,8 @@ export function EditProfileForm() {
     const [lastName, setLastName] = useState(currentUser.lastName);
     const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || "");
     const [aboutMe, setAboutMe] = useState(currentUser.aboutMe || "");
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; aboutMe?: string }>({});
 
@@ -25,10 +28,12 @@ export function EditProfileForm() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setSelectedFile(file);
         setAvatarUrl(URL.createObjectURL(file));
     };
 
     const handleRemoveAvatar = () => {
+        setSelectedFile(null);
         setAvatarUrl("");
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -58,22 +63,40 @@ export function EditProfileForm() {
         return Object.keys(newErrors).length === 0;
     };
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         if (!validate()) {
             return;
         }
 
-        updateCurrentUser({
-            firstName,
-            lastName,
-            avatarUrl,
-            aboutMe,
-        });
+        setIsSubmitting(true);
+        try {
+            let finalAvatarUrl = avatarUrl;
+            if (selectedFile) {
+                try {
+                    const uploadedUser = await uploadAvatarApi(selectedFile);
+                    if (uploadedUser?.avatarUrl) {
+                        finalAvatarUrl = uploadedUser.avatarUrl;
+                    }
+                } catch (err) {
+                    console.error("Ошибка при загрузке аватара:", err);
+                }
+            }
 
-        navigate(profilePath);
+            await updateCurrentUser({
+                firstName,
+                lastName,
+                avatarUrl: finalAvatarUrl,
+                aboutMe,
+            });
+
+            navigate(profilePath);
+        } finally {
+            setIsSubmitting(false);
+        }
     }
+
 
     return (
         <Form className="flex flex-col gap-6" onSubmit={handleSubmit}>
@@ -192,7 +215,9 @@ export function EditProfileForm() {
                 <Button type="button" variant="ghost" onPress={() => navigate(profilePath)}>
                     Отмена
                 </Button>
-                <Button type="submit">Сохранить</Button>
+                <Button type="submit" isDisabled={isSubmitting}>
+                    {isSubmitting ? "Сохранение..." : "Сохранить"}
+                </Button>
             </div>
         </Form>
     );
