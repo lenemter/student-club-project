@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -23,7 +23,7 @@ def get_join_requests(
         return list(session.exec(query).all())
 
 
-def get_join_request_by_id(request_id: int) -> Union[JoinRequest, None]:
+def get_join_request_by_id(request_id: int) -> JoinRequest | None:
     with Session(engine) as session:
         return session.get(JoinRequest, request_id)
 

@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -6,7 +6,7 @@ from ..db import engine
 from ..models.user import User
 
 
-def get_user_by_id(user_id: int | None) -> Union[User, None]:
+def get_user_by_id(user_id: int | None) -> User | None:
     if user_id is None:
         return None
 
@@ -14,7 +14,7 @@ def get_user_by_id(user_id: int | None) -> Union[User, None]:
         return session.get(User, user_id)
 
 
-def get_user_by_email(email: str) -> Union[User, None]:
+def get_user_by_email(email: str) -> User | None:
     with Session(engine) as session:
         return session.exec(select(User).where(User.email == email)).first()
 

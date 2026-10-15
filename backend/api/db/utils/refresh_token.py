@@ -45,7 +45,7 @@ def revoke_user_refresh_tokens(user_id: int) -> None:
         records = session.exec(
             select(RefreshToken).where(
                 RefreshToken.user_id == user_id,
-                RefreshToken.revoked == False,  # noqa: E712
+                RefreshToken.revoked == False,
             )
         ).all()
         for record in records:

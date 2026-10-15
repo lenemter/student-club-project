@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from sqlmodel import Session, col, select
 
@@ -17,7 +17,7 @@ def get_user_notifications(user_id: int) -> list[Notification]:
         )
 
 
-def get_notification_by_id(notification_id: int) -> Union[Notification, None]:
+def get_notification_by_id(notification_id: int) -> Notification | None:
     with Session(engine) as session:
         return session.get(Notification, notification_id)
 

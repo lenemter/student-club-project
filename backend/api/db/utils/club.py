@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 from sqlmodel import Session, col, or_, select
 
@@ -13,7 +13,7 @@ def get_all_clubs() -> list[Club]:
         return list(session.exec(select(Club)).all())
 
 
-def get_club_by_id(club_id: int) -> Union[Club, None]:
+def get_club_by_id(club_id: int) -> Club | None:
     with Session(engine) as session:
         return session.get(Club, club_id)
 

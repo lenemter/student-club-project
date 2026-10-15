@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Union
 
 from sqlmodel import Session, select
 
@@ -29,7 +28,7 @@ def get_club_attendance(club_id: int) -> list[tuple[AttendanceRecord, list[int]]
         return result
 
 
-def get_attendance_by_id(record_id: int) -> Union[tuple[AttendanceRecord, list[int]], None]:
+def get_attendance_by_id(record_id: int) -> tuple[AttendanceRecord, list[int]] | None:
     with Session(engine, expire_on_commit=False) as session:
         record = session.get(AttendanceRecord, record_id)
         if record is None:
