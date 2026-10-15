@@ -2,6 +2,7 @@ import { Check, Persons, Picture, TrashBin } from "@gravity-ui/icons";
 import { Button, FieldError, Form, IconPlus, Input, Label, Modal, TextArea, TextField } from "@heroui/react";
 import { useRef, useState } from "react";
 import { useStore, type CreateClubDto } from "../../../app/providers/StoreContext";
+import { uploadClubImageApi } from "../../../shared/lib";
 
 export interface NewClubButtonProps {
     onClubCreated?: (newClub: CreateClubDto) => void;
@@ -16,6 +17,8 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState("");
     const [imageUrl, setImageUrl] = useState("");
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [errors, setErrors] = useState<{
         name?: string;
@@ -27,10 +30,12 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setSelectedFile(file);
         setImageUrl(URL.createObjectURL(file));
     };
 
     const handleRemoveImage = () => {
+        setSelectedFile(null);
         setImageUrl("");
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -64,35 +69,53 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
         return Object.keys(newErrors).length === 0;
     };
 
-    function onFormSubmit(e: React.FormEvent) {
+    async function onFormSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         if (!validate()) {
             return;
         }
 
-        const clubData: CreateClubDto = {
-            name: name.trim(),
-            description: description.trim(),
-            schedule: schedule.trim(),
-            imageUrl: imageUrl || undefined,
-        };
+        setIsSubmitting(true);
+        try {
+            let finalImageUrl = imageUrl;
+            if (selectedFile) {
+                try {
+                    const uploadRes = await uploadClubImageApi(selectedFile);
+                    if (uploadRes?.imageUrl) {
+                        finalImageUrl = uploadRes.imageUrl;
+                    }
+                } catch (uploadErr) {
+                    console.error("Failed to upload image:", uploadErr);
+                }
+            }
 
-        createClub(clubData);
+            const clubData: CreateClubDto = {
+                name: name.trim(),
+                description: description.trim(),
+                schedule: schedule.trim(),
+                imageUrl: finalImageUrl || undefined,
+            };
 
-        if (onClubCreated) {
-            onClubCreated(clubData);
+            await createClub(clubData);
+
+            if (onClubCreated) {
+                onClubCreated(clubData);
+            }
+
+            setName("");
+            setDescription("");
+            setSchedule("");
+            setImageUrl("");
+            setSelectedFile(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+            setErrors({});
+            setIsOpen(false);
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setName("");
-        setDescription("");
-        setSchedule("");
-        setImageUrl("");
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-        setErrors({});
-        setIsOpen(false);
     }
 
     const handleOpenChange = (open: boolean) => {
@@ -102,12 +125,14 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
             setDescription("");
             setSchedule("");
             setImageUrl("");
+            setSelectedFile(null);
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
             setErrors({});
         }
     };
+
 
     return (
         <Modal isOpen={isOpen} onOpenChange={handleOpenChange}>
@@ -236,9 +261,9 @@ export function NewClubButton({ onClubCreated }: NewClubButtonProps) {
                                     {errors.schedule ? <FieldError>{errors.schedule}</FieldError> : <FieldError />}
                                 </TextField>
 
-                                <Button type="submit" className="mt-4">
+                                <Button type="submit" className="mt-4" isDisabled={isSubmitting}>
                                     <Check />
-                                    Создать
+                                    {isSubmitting ? "Создание..." : "Создать"}
                                 </Button>
                             </Form>
                         </Modal.Body>

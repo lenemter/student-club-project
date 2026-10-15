@@ -32,6 +32,7 @@ export function ClubPage() {
         approveJoinRequest,
         rejectJoinRequest,
         addAttendanceRecord,
+        deleteClub,
     } = useStore();
 
     const club: Club | undefined = getClubById(clubId);
@@ -96,6 +97,19 @@ export function ClubPage() {
         setIsAttendanceModalOpen(false);
         setSelectedUserIds([]);
     };
+
+    const handleDeleteClub = async () => {
+        if (!window.confirm(`Вы уверены, что хотите удалить кружок «${club.name}»?`)) {
+            return;
+        }
+        try {
+            await deleteClub(club.id);
+            navigate("/");
+        } catch (err) {
+            console.error("Ошибка при удалении кружка:", err);
+        }
+    };
+
 
     return (
         <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
@@ -257,9 +271,19 @@ export function ClubPage() {
                     <Card className="lg:sticky lg:top-8">
                         <Card.Content className="flex flex-col gap-5">
                             {isLeader ? (
-                                <Button size="lg" className="w-full" isDisabled>
-                                    Вы руководитель
-                                </Button>
+                                <div className="flex flex-col gap-2">
+                                    <Button size="lg" className="w-full" isDisabled>
+                                        Вы руководитель
+                                    </Button>
+                                    <Button
+                                        size="md"
+                                        variant="danger"
+                                        className="w-full"
+                                        onPress={handleDeleteClub}
+                                    >
+                                        Удалить кружок
+                                    </Button>
+                                </div>
                             ) : myRequestStatus === "approved" ? (
                                 <Button size="lg" variant="danger" className="w-full" onPress={handleLeave}>
                                     Выйти из кружка

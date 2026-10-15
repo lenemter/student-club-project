@@ -36,18 +36,21 @@ export interface StoreContextType {
     getUserRequestStatusForClub: (clubId: number) => "none" | "pending" | "approved";
 
     // Actions (user scripts)
-    createClub: (data: CreateClubDto) => Club;
-    updateCurrentUser: (data: UpdateProfileDto) => void;
+    createClub: (data: CreateClubDto) => Promise<Club> | Club;
+    updateClub: (id: number, data: Partial<CreateClubDto>) => Promise<Club>;
+    deleteClub: (id: number) => Promise<void>;
+    refreshClubs: () => Promise<void>;
+    updateCurrentUser: (data: UpdateProfileDto) => Promise<void> | void;
     login: (email: string, password?: string) => Promise<boolean> | boolean;
     signup: (user: Omit<User, "id">, password?: string) => Promise<User> | User;
     logout: () => Promise<void> | void;
-    requestToJoinClub: (clubId: number) => void;
-    cancelJoinRequest: (clubId: number) => void;
-    leaveClub: (clubId: number) => void;
-    approveJoinRequest: (requestId: number) => void;
-    rejectJoinRequest: (requestId: number) => void;
-    addAttendanceRecord: (clubId: number, attendedUserIds: number[]) => AttendanceRecord;
-    markNotificationAsRead: (notificationId: number) => void;
+    requestToJoinClub: (clubId: number) => Promise<void> | void;
+    cancelJoinRequest: (clubId: number) => Promise<void> | void;
+    leaveClub: (clubId: number) => Promise<void> | void;
+    approveJoinRequest: (requestId: number) => Promise<void> | void;
+    rejectJoinRequest: (requestId: number) => Promise<void> | void;
+    addAttendanceRecord: (clubId: number, attendedUserIds: number[]) => Promise<AttendanceRecord> | AttendanceRecord;
+    markNotificationAsRead: (notificationId: number) => Promise<void> | void;
 }
 
 export const StoreContext = createContext<StoreContextType | null>(null);

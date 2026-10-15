@@ -7,7 +7,21 @@ import { mockJoinRequests as initialJoinRequests } from "../../entities/join-req
 import { mockAttendance as initialAttendance } from "../../entities/attendance/model/mockAttendance";
 import { mockNotifications as initialNotifications } from "../../entities/notification/model/mockNotifications";
 import { StoreContext, type CreateClubDto, type UpdateProfileDto } from "./StoreContext";
-import { getCurrentUserApi, loginApi, logoutApi, registerApi } from "../../shared/lib";
+import {
+    createClubApi,
+    deleteClubApi,
+    getAccessToken,
+    getClubsApi,
+    getCurrentUserApi,
+    getJoinRequestsApi,
+    getMyMembershipsApi,
+    getNotificationsApi,
+    getUsersApi,
+    loginApi,
+    logoutApi,
+    registerApi,
+    updateClubApi,
+} from "../../shared/lib";
 
 const STORAGE_KEY_PREFIX = "student_clubs_";
 
@@ -56,7 +70,47 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     useEffect(() => saveToStorage("attendance", attendanceRecords), [attendanceRecords]);
     useEffect(() => saveToStorage("notifications", notifications), [notifications]);
 
-    // Restore authenticated session from backend if tokens exist
+    // Refresh clubs and users from backend
+    const refreshClubs = async (): Promise<void> => {
+        try {
+            const loadedClubs = await getClubsApi();
+            if (loadedClubs) {
+                setClubs(loadedClubs);
+            }
+        } catch {
+            // Ignore offline errors
+        }
+    };
+
+    const refreshData = async (): Promise<void> => {
+        try {
+            const [loadedClubs, loadedUsers] = await Promise.all([
+                getClubsApi().catch(() => null),
+                getUsersApi().catch(() => null),
+            ]);
+            if (loadedClubs && loadedClubs.length > 0) {
+                setClubs(loadedClubs);
+            }
+            if (loadedUsers && loadedUsers.length > 0) {
+                setUsers(loadedUsers);
+            }
+
+            if (getAccessToken()) {
+                const [myMemberships, requests, notifs] = await Promise.all([
+                    getMyMembershipsApi().catch(() => null),
+                    getJoinRequestsApi().catch(() => null),
+                    getNotificationsApi().catch(() => null),
+                ]);
+                if (myMemberships) setMemberships(myMemberships);
+                if (requests) setJoinRequests(requests);
+                if (notifs) setNotifications(notifs);
+            }
+        } catch {
+            // Ignore network errors
+        }
+    };
+
+    // Restore authenticated session and load backend data on mount
     useEffect(() => {
         getCurrentUserApi()
             .then((user) => {
@@ -64,8 +118,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                     setCurrentUser(user);
                 }
             })
-            .catch(() => {});
+            .catch(() => {})
+            .finally(() => {
+                refreshData();
+            });
     }, []);
+
 
     // Selectors
     const getUserById = (id: number): User | undefined => {
@@ -127,33 +185,78 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     // Actions (user scripts)
-    const createClub = (data: CreateClubDto): Club => {
-        const newClub: Club = {
-            id: Date.now(),
-            name: data.name.trim(),
-            description: data.description.trim(),
-            schedule: data.schedule.trim(),
-            imageUrl:
-                data.imageUrl ||
-                "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
-            leaderId: currentUser.id,
-        };
+    const createClub = async (data: CreateClubDto): Promise<Club> => {
+        try {
+            const newClub = await createClubApi({
+                name: data.name.trim(),
+                description: data.description.trim(),
+                schedule: data.schedule.trim(),
+                imageUrl: data.imageUrl,
+            });
+            setClubs((prev) => [newClub, ...prev.filter((c) => c.id !== newClub.id)]);
 
-        setClubs((prev) => [newClub, ...prev]);
+            const newNotification: Notification = {
+                id: Date.now(),
+                userId: currentUser.id,
+                title: "Кружок создан",
+                description: `Вы успешно создали кружок «${newClub.name}»`,
+                createdAt: "Только что",
+                isRead: false,
+                type: "success",
+            };
+            setNotifications((prev) => [newNotification, ...prev]);
+            return newClub;
+        } catch {
+            const newClub: Club = {
+                id: Date.now(),
+                name: data.name.trim(),
+                description: data.description.trim(),
+                schedule: data.schedule.trim(),
+                imageUrl:
+                    data.imageUrl ||
+                    "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/demo1.jpg",
+                leaderId: currentUser.id,
+            };
 
-        const newNotification: Notification = {
-            id: Date.now(),
-            userId: currentUser.id,
-            title: "Кружок создан",
-            description: `Вы успешно создали кружок «${newClub.name}»`,
-            createdAt: "Только что",
-            isRead: false,
-            type: "success",
-        };
-        setNotifications((prev) => [newNotification, ...prev]);
+            setClubs((prev) => [newClub, ...prev]);
 
-        return newClub;
+            const newNotification: Notification = {
+                id: Date.now(),
+                userId: currentUser.id,
+                title: "Кружок создан",
+                description: `Вы успешно создали кружок «${newClub.name}»`,
+                createdAt: "Только что",
+                isRead: false,
+                type: "success",
+            };
+            setNotifications((prev) => [newNotification, ...prev]);
+
+            return newClub;
+        }
     };
+
+    const updateClub = async (id: number, data: Partial<CreateClubDto>): Promise<Club> => {
+        try {
+            const updated = await updateClubApi(id, data);
+            setClubs((prev) => prev.map((c) => (c.id === id ? updated : c)));
+            return updated;
+        } catch {
+            setClubs((prev) =>
+                prev.map((c) => (c.id === id ? { ...c, ...data } : c)),
+            );
+            const found = clubs.find((c) => c.id === id);
+            return found ? { ...found, ...data } : (data as Club);
+        }
+    };
+
+    const deleteClub = async (id: number): Promise<void> => {
+        try {
+            await deleteClubApi(id);
+        } finally {
+            setClubs((prev) => prev.filter((c) => c.id !== id));
+        }
+    };
+
 
     const updateCurrentUser = (data: UpdateProfileDto): void => {
         const updated: User = {
@@ -348,6 +451,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 getClubPendingRequests,
                 getUserRequestStatusForClub,
                 createClub,
+                updateClub,
+                deleteClub,
+                refreshClubs,
                 updateCurrentUser,
                 login,
                 signup,
