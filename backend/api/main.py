@@ -1,6 +1,6 @@
 import os
 import dotenv
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -32,10 +32,12 @@ os.makedirs(os.path.join(UPLOAD_DIR, "avatars"), exist_ok=True)
 os.makedirs(os.path.join(UPLOAD_DIR, "clubs"), exist_ok=True)
 app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
 
-app.include_router(api.routers.auth_router)
-app.include_router(api.routers.users_router)
-app.include_router(api.routers.clubs_router)
-app.include_router(api.routers.memberships_router)
-app.include_router(api.routers.join_requests_router)
-app.include_router(api.routers.attendance_router)
-app.include_router(api.routers.notifications_router)
+api_v1_router = APIRouter(prefix="/api/v1")
+api_v1_router.include_router(api.routers.auth_router)
+api_v1_router.include_router(api.routers.users_router)
+api_v1_router.include_router(api.routers.clubs_router)
+api_v1_router.include_router(api.routers.memberships_router)
+api_v1_router.include_router(api.routers.join_requests_router)
+api_v1_router.include_router(api.routers.attendance_router)
+api_v1_router.include_router(api.routers.notifications_router)
+app.include_router(api_v1_router)

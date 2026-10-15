@@ -52,7 +52,7 @@ async def create_attendance(
 
 
 @router.get("/attendance/{record_id}", response_model=api.schemas.AttendanceRecordPublic)
-async def get_attendance(record_id: int):
+async def get_attendance(record_id: int, _: api.dependencies.CurrentUserDep):
     item = api.db.get_attendance_by_id(record_id)
     if item is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Attendance record not found")

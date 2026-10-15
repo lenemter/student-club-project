@@ -4,6 +4,7 @@ from .models.club import Club
 from .models.join_request import JoinRequest
 from .models.membership import Membership
 from .models.notification import Notification
+from .models.refresh_token import RefreshToken
 from .models.user import User
 from .utils.attendance import (
     create_attendance,
@@ -43,6 +44,12 @@ from .utils.notification import (
     get_user_notifications,
     update_notification,
 )
+from .utils.refresh_token import (
+    create_refresh_token,
+    get_refresh_token,
+    revoke_refresh_token,
+    revoke_user_refresh_tokens,
+)
 from .utils.user import (
     get_all_users,
     get_user_by_email,
@@ -61,6 +68,7 @@ __all__ = [
     "AttendanceRecord",
     "AttendanceUser",
     "Notification",
+    "RefreshToken",
     "get_user_by_id",
     "get_user_by_email",
     "register_user",
@@ -94,4 +102,8 @@ __all__ = [
     "create_notification",
     "update_notification",
     "delete_notification",
+    "create_refresh_token",
+    "get_refresh_token",
+    "revoke_refresh_token",
+    "revoke_user_refresh_tokens",
 ]

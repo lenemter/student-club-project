@@ -36,6 +36,12 @@ from .notification import (
     get_user_notifications,
     update_notification,
 )
+from .refresh_token import (
+    create_refresh_token,
+    get_refresh_token,
+    revoke_refresh_token,
+    revoke_user_refresh_tokens,
+)
 from .user import (
     get_all_users,
     get_user_by_email,
@@ -78,4 +84,8 @@ __all__ = [
     "create_notification",
     "update_notification",
     "delete_notification",
+    "create_refresh_token",
+    "get_refresh_token",
+    "revoke_refresh_token",
+    "revoke_user_refresh_tokens",
 ]

@@ -65,7 +65,7 @@ async def get_club_members(club: api.dependencies.ClubDep):
 
 @router.post("/upload-image", response_model=dict[str, str])
 async def upload_club_image(
-    current_user: api.dependencies.CurrentUserDep,
+    _: api.dependencies.CurrentUserDep,
     file: UploadFile = File(...),
 ):
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
@@ -84,6 +84,7 @@ async def upload_club_image(
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    # TODO: отдельная response model для image'ей
     image_url = f"/static/clubs/{filename}"
     return {"imageUrl": image_url, "image_url": image_url}
 

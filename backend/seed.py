@@ -6,6 +6,7 @@ import sys
 # Ensure backend directory is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from sqlalchemy import text
 from sqlmodel import Session, select
 import api.db as db
 import api.utils as utils
@@ -178,6 +179,11 @@ def seed():
         ]
         for n in notifications_data:
             session.add(db.Notification(**n))
+        session.commit()
+
+        # Update sequences so subsequent inserts without explicit ID work properly
+        session.execute(text('SELECT setval(\'user_id_seq\', COALESCE((SELECT MAX(id) FROM "user"), 1));'))
+        session.execute(text('SELECT setval(\'club_id_seq\', COALESCE((SELECT MAX(id) FROM "club"), 1));'))
         session.commit()
 
         print("Seeding completed successfully!")

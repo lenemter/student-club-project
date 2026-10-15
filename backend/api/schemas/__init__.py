@@ -15,7 +15,7 @@ from .notification import (
     NotificationPublic,
     NotificationUpdate,
 )
-from .token import Token
+from .token import LogoutRequest, RefreshTokenRequest, Token
 from .unset_type import Unset, UnsetType
 from .user import UserCreate, UserPublic, UserUpdate
 
@@ -23,6 +23,8 @@ __all__ = [
     "Unset",
     "UnsetType",
     "Token",
+    "RefreshTokenRequest",
+    "LogoutRequest",
     "UserPublic",
     "UserCreate",
     "UserUpdate",

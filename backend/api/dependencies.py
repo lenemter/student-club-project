@@ -20,8 +20,8 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 # --- User Validation ---
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="auth/token", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> api.db.User:
@@ -35,7 +35,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> api
         secret_key = api.utils.read_secret("SECRET_KEY") or "default_secret_key_student_clubs"
         payload = jwt.decode(token, secret_key, algorithms=[api.utils.HASH_ALGORITHM])
         email = payload.get("sub")
-        if email is None:
+        token_type = payload.get("type", "access")
+        if email is None or token_type != "access":
             raise credentials_exception
     except jwt.InvalidTokenError:
         raise credentials_exception
@@ -61,7 +62,8 @@ async def get_current_user_optional(
         secret_key = api.utils.read_secret("SECRET_KEY") or "default_secret_key_student_clubs"
         payload = jwt.decode(token, secret_key, algorithms=[api.utils.HASH_ALGORITHM])
         email = payload.get("sub")
-        if email is None:
+        token_type = payload.get("type", "access")
+        if email is None or token_type != "access":
             return None
         return api.db.get_user_by_email(email)
     except jwt.InvalidTokenError:
