@@ -15,32 +15,40 @@ export function HomePage() {
         );
     }
 
-    const myClubs = getUserClubs(currentUser.id);
+    const myClubs = currentUser ? getUserClubs(currentUser.id) : [];
     const otherClubs = getJoinableClubs();
 
     return (
         <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center">
             <div className="w-full max-w-5xl flex flex-col gap-8">
                 <div className="flex flex-col gap-2 w-full sm:flex-row sm:items-center sm:justify-between">
-                    <Typography type="h1">Привет, {currentUser.firstName} 👋</Typography>
+                    <Typography type="h1">
+                        {currentUser ? `Привет, ${currentUser.firstName} 👋` : "Студенческие кружки"}
+                    </Typography>
                     <div className="flex items-center justify-end gap-2">
-                        <NewClubButton />
+                        {currentUser && <NewClubButton />}
                         <HeaderBar />
                     </div>
                 </div>
 
-                <ClubCardGrid
-                    title="Мои кружки"
-                    clubs={myClubs}
-                    emptyTitle="Вы пока не состоите в кружках"
-                    emptyDescription="Создайте свой собственный кружок с помощью кнопки выше или подайте заявку на вступление."
-                />
+                {currentUser && (
+                    <ClubCardGrid
+                        title="Мои кружки"
+                        clubs={myClubs}
+                        emptyTitle="Вы пока не состоите в кружках"
+                        emptyDescription="Создайте свой собственный кружок с помощью кнопки выше или подайте заявку на вступление."
+                    />
+                )}
 
                 <ClubCardGrid
-                    title="Другие кружки"
+                    title={currentUser ? "Другие кружки" : "Все кружки"}
                     clubs={otherClubs}
                     emptyTitle="Нет доступных кружков"
-                    emptyDescription="Вы уже состоите или являетесь руководителем всех доступных кружков."
+                    emptyDescription={
+                        currentUser
+                            ? "Вы уже состоите или являетесь руководителем всех доступных кружков."
+                            : "Кружки пока не созданы."
+                    }
                 />
             </div>
         </main>

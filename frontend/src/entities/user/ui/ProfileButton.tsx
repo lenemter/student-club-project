@@ -8,6 +8,14 @@ export function ProfileButton() {
     const navigate = useNavigate();
     const { currentUser, logout } = useStore();
 
+    if (!currentUser) {
+        return (
+            <Button variant="outline" size="md" onPress={() => navigate("/login")}>
+                Войти
+            </Button>
+        );
+    }
+
     return (
         <Dropdown>
             <Button aria-label="Профиль" size="lg" variant="outline" className="px-2 py-6">

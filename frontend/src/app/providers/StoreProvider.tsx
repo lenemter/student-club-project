@@ -1,11 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { User, Club, Membership, JoinRequest, Notification, AttendanceRecord } from "../../shared/types";
-import { mockUsers as initialUsers, currentUser as initialCurrentUser } from "../../entities/user/model/mockUsers";
+import { mockUsers as initialUsers } from "../../entities/user/model/mockUsers";
 import { mockClubs as initialClubs } from "../../entities/club/model/mockClubs";
-import { mockMemberships as initialMemberships } from "../../entities/club/model/mockMemberships";
-import { mockJoinRequests as initialJoinRequests } from "../../entities/join-request/model/mockJoinRequests";
 import { mockAttendance as initialAttendance } from "../../entities/attendance/model/mockAttendance";
-import { mockNotifications as initialNotifications } from "../../entities/notification/model/mockNotifications";
 import { StoreContext, type CreateClubDto, type UpdateProfileDto } from "./StoreContext";
 import {
     createAttendanceRecordApi,
@@ -51,27 +48,45 @@ function saveToStorage<T>(key: string, value: T): void {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
     const [users, setUsers] = useState<User[]>(() => loadFromStorage("users", initialUsers));
-    const [currentUser, setCurrentUser] = useState<User>(() =>
-        loadFromStorage("current_user", initialCurrentUser),
-    );
+    const [currentUser, setCurrentUser] = useState<User | null>(() => {
+        if (!getAccessToken()) {
+            try {
+                localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
+            } catch {
+                // Ignore storage errors
+            }
+            return null;
+        }
+        return loadFromStorage<User | null>("current_user", null);
+    });
     const [clubs, setClubs] = useState<Club[]>(() => loadFromStorage("clubs", initialClubs));
     const [memberships, setMemberships] = useState<Membership[]>(() =>
-        loadFromStorage("memberships", initialMemberships),
+        getAccessToken() ? loadFromStorage("memberships", []) : [],
     );
     const [joinRequests, setJoinRequests] = useState<JoinRequest[]>(() =>
-        loadFromStorage("join_requests", initialJoinRequests),
+        getAccessToken() ? loadFromStorage("join_requests", []) : [],
     );
     const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(() =>
         loadFromStorage("attendance", initialAttendance),
     );
     const [notifications, setNotifications] = useState<Notification[]>(() =>
-        loadFromStorage("notifications", initialNotifications),
+        getAccessToken() ? loadFromStorage("notifications", []) : [],
     );
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // LocalStorage
     useEffect(() => saveToStorage("users", users), [users]);
-    useEffect(() => saveToStorage("current_user", currentUser), [currentUser]);
+    useEffect(() => {
+        if (currentUser) {
+            saveToStorage("current_user", currentUser);
+        } else {
+            try {
+                localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
+            } catch {
+                // Ignore storage errors
+            }
+        }
+    }, [currentUser]);
     useEffect(() => saveToStorage("clubs", clubs), [clubs]);
     useEffect(() => saveToStorage("memberships", memberships), [memberships]);
     useEffect(() => saveToStorage("join_requests", joinRequests), [joinRequests]);
@@ -120,18 +135,40 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     // Restore authenticated session and load backend data on mount
     useEffect(() => {
-        getCurrentUserApi()
-            .then((user) => {
-                if (user) {
+        let isMounted = true;
+
+        const init = async () => {
+            const token = getAccessToken();
+            if (!token) {
+                await refreshData();
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+                return;
+            }
+
+            try {
+                const user = await getCurrentUserApi();
+                if (isMounted) {
                     setCurrentUser(user);
                 }
-            })
-            .catch(() => {})
-            .finally(() => {
-                refreshData().finally(() => {
+            } catch {
+                if (isMounted) {
+                    setCurrentUser(null);
+                }
+            } finally {
+                await refreshData();
+                if (isMounted) {
                     setIsLoading(false);
-                });
-            });
+                }
+            }
+        };
+
+        void init();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
 
@@ -152,6 +189,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const getJoinableClubs = (): Club[] => {
+        if (!currentUser) return clubs;
         const myClubIds = memberships.filter((m) => m.userId === currentUser.id).map((m) => m.clubId);
         return clubs.filter((c) => !myClubIds.includes(c.id) && c.leaderId !== currentUser.id);
     };
@@ -185,6 +223,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const getUserRequestStatusForClub = (clubId: number): "none" | "pending" | "approved" => {
+        if (!currentUser) return "none";
         const isMember = memberships.some((m) => m.clubId === clubId && m.userId === currentUser.id);
         if (isMember) return "approved";
 
@@ -196,6 +235,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     // Actions (user scripts)
     const createClub = async (data: CreateClubDto): Promise<Club> => {
+        if (!currentUser) {
+            throw new Error("Необходимо войти в систему для создания кружка");
+        }
         try {
             const newClub = await createClubApi({
                 name: data.name.trim(),
@@ -269,6 +311,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
 
     const updateCurrentUser = async (data: UpdateProfileDto): Promise<void> => {
+        if (!currentUser) {
+            throw new Error("Необходимо войти в систему для изменения профиля");
+        }
         try {
             const updated = await updateProfileApi({
                 firstName: data.firstName.trim(),
@@ -298,6 +343,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             setUsers((prev) =>
                 prev.some((u) => u.id === user.id) ? prev.map((u) => (u.id === user.id ? user : u)) : [...prev, user],
             );
+            await refreshData();
             return true;
         }
 
@@ -323,6 +369,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 prev.some((u) => u.id === user.id) ? prev.map((u) => (u.id === user.id ? user : u)) : [...prev, user],
             );
             setCurrentUser(user);
+            await refreshData();
             return user;
         }
 
@@ -337,12 +384,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = async (): Promise<void> => {
-        await logoutApi();
-        localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
-        setCurrentUser(initialCurrentUser);
+        try {
+            await logoutApi();
+        } finally {
+            try {
+                localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
+                localStorage.removeItem(STORAGE_KEY_PREFIX + "memberships");
+                localStorage.removeItem(STORAGE_KEY_PREFIX + "join_requests");
+                localStorage.removeItem(STORAGE_KEY_PREFIX + "notifications");
+            } catch {
+                // Ignore storage errors
+            }
+            setCurrentUser(null);
+            setMemberships([]);
+            setJoinRequests([]);
+            setNotifications([]);
+        }
     };
 
     const requestToJoinClub = async (clubId: number): Promise<void> => {
+        if (!currentUser) {
+            throw new Error("Необходимо войти в систему для подачи заявки");
+        }
         const existing = joinRequests.find(
             (r) => r.clubId === clubId && r.userId === currentUser.id && r.status === "pending",
         );
@@ -364,6 +427,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const cancelJoinRequest = async (clubId: number): Promise<void> => {
+        if (!currentUser) return;
         const existing = joinRequests.find(
             (r) => r.clubId === clubId && r.userId === currentUser.id && r.status === "pending",
         );
@@ -380,6 +444,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const leaveClub = async (clubId: number): Promise<void> => {
+        if (!currentUser) return;
         try {
             await removeMemberApi(clubId, currentUser.id);
         } catch {
@@ -466,6 +531,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         <StoreContext.Provider
             value={{
                 currentUser,
+                isAuthenticated: Boolean(currentUser),
                 users,
                 clubs,
                 memberships,

@@ -77,10 +77,14 @@ export function ClubPage() {
     const members = getClubMembers(club.id);
     const attendanceList = getClubAttendance(club.id);
     const requests = getClubPendingRequests(club.id);
-    const myRequestStatus = getUserRequestStatusForClub(club.id);
-    const isLeader = club.leaderId === currentUser.id;
+    const myRequestStatus = currentUser ? getUserRequestStatusForClub(club.id) : "none";
+    const isLeader = currentUser ? club.leaderId === currentUser.id : false;
 
     const handleJoin = async () => {
+        if (!currentUser) {
+            navigate("/login");
+            return;
+        }
         await requestToJoinClub(club.id);
     };
 
@@ -279,7 +283,11 @@ export function ClubPage() {
 
                     <Card className="lg:sticky lg:top-8">
                         <Card.Content className="flex flex-col gap-5">
-                            {isLeader ? (
+                            {!currentUser ? (
+                                <Button size="lg" className="w-full" onPress={() => navigate("/login")}>
+                                    Войдите, чтобы вступить
+                                </Button>
+                            ) : isLeader ? (
                                 <div className="flex flex-col gap-2">
                                     <Button size="lg" className="w-full" isDisabled>
                                         Вы руководитель

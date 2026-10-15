@@ -17,7 +17,8 @@ export interface UpdateProfileDto {
 
 export interface StoreContextType {
     // State
-    currentUser: User;
+    currentUser: User | null;
+    isAuthenticated: boolean;
     users: User[];
     clubs: Club[];
     memberships: Membership[];

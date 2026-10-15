@@ -38,7 +38,7 @@ export function ProfilePage() {
         );
     }
 
-    const isOwn = user.id === currentUser.id;
+    const isOwn = currentUser ? user.id === currentUser.id : false;
     const userClubs = getUserClubs(user.id);
 
     return (

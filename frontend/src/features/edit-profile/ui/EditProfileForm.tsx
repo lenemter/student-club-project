@@ -12,17 +12,17 @@ export function EditProfileForm() {
     const { currentUser, updateCurrentUser } = useStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const [firstName, setFirstName] = useState(currentUser.firstName);
-    const [lastName, setLastName] = useState(currentUser.lastName);
-    const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || "");
-    const [aboutMe, setAboutMe] = useState(currentUser.aboutMe || "");
+    const [firstName, setFirstName] = useState(currentUser?.firstName || "");
+    const [lastName, setLastName] = useState(currentUser?.lastName || "");
+    const [avatarUrl, setAvatarUrl] = useState(currentUser?.avatarUrl || "");
+    const [aboutMe, setAboutMe] = useState(currentUser?.aboutMe || "");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; aboutMe?: string }>({});
 
     const avatarFallback = ((firstName[0] ?? "") + (lastName[0] ?? "")).toUpperCase() || "?";
-    const profilePath = `/profile/${currentUser.id}`;
+    const profilePath = currentUser ? `/profile/${currentUser.id}` : "/";
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

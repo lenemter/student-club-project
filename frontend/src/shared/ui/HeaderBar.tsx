@@ -7,14 +7,14 @@ import { useStore } from "../../app/providers/StoreContext";
 
 export function HeaderBar() {
     const navigate = useNavigate();
-    const { notifications } = useStore();
+    const { notifications, currentUser } = useStore();
 
     return (
         <div className="flex gap-2 items-center">
             <Button isIconOnly variant="ghost" size="lg" aria-label="На главную" onPress={() => navigate("/")}>
                 <House className="size-5" />
             </Button>
-            <NotificationButton notifications={notifications} />
+            {currentUser && <NotificationButton notifications={notifications} />}
             <ProfileButton />
         </div>
     );
