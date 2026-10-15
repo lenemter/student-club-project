@@ -24,71 +24,15 @@ import {
     updateProfileApi,
 } from "../../shared/lib";
 
-const STORAGE_KEY_PREFIX = "student_clubs_";
-
-function loadFromStorage<T>(key: string, fallback: T): T {
-    try {
-        const item = localStorage.getItem(STORAGE_KEY_PREFIX + key);
-        return item ? JSON.parse(item) : fallback;
-    } catch {
-        return fallback;
-    }
-}
-
-function saveToStorage<T>(key: string, value: T): void {
-    try {
-        localStorage.setItem(STORAGE_KEY_PREFIX + key, JSON.stringify(value));
-    } catch {
-        // Ignore localStorage quota errors
-    }
-}
-
 export function StoreProvider({ children }: { children: ReactNode }) {
-    const [users, setUsers] = useState<User[]>(() => loadFromStorage("users", []));
-    const [currentUser, setCurrentUser] = useState<User | null>(() => {
-        if (!getAccessToken()) {
-            try {
-                localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
-            } catch {
-                // Ignore storage errors
-            }
-            return null;
-        }
-        return loadFromStorage<User | null>("current_user", null);
-    });
-    const [clubs, setClubs] = useState<Club[]>(() => loadFromStorage("clubs", []));
-    const [memberships, setMemberships] = useState<Membership[]>(() =>
-        getAccessToken() ? loadFromStorage("memberships", []) : [],
-    );
-    const [joinRequests, setJoinRequests] = useState<JoinRequest[]>(() =>
-        getAccessToken() ? loadFromStorage("join_requests", []) : [],
-    );
-    const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(() =>
-        loadFromStorage("attendance", []),
-    );
-    const [notifications, setNotifications] = useState<Notification[]>(() =>
-        getAccessToken() ? loadFromStorage("notifications", []) : [],
-    );
+    const [users, setUsers] = useState<User[]>([]);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [clubs, setClubs] = useState<Club[]>([]);
+    const [memberships, setMemberships] = useState<Membership[]>([]);
+    const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
+    const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    // LocalStorage
-    useEffect(() => saveToStorage("users", users), [users]);
-    useEffect(() => {
-        if (currentUser) {
-            saveToStorage("current_user", currentUser);
-        } else {
-            try {
-                localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
-            } catch {
-                // Ignore storage errors
-            }
-        }
-    }, [currentUser]);
-    useEffect(() => saveToStorage("clubs", clubs), [clubs]);
-    useEffect(() => saveToStorage("memberships", memberships), [memberships]);
-    useEffect(() => saveToStorage("join_requests", joinRequests), [joinRequests]);
-    useEffect(() => saveToStorage("attendance", attendanceRecords), [attendanceRecords]);
-    useEffect(() => saveToStorage("notifications", notifications), [notifications]);
 
     // Refresh clubs and users from backend
     const refreshClubs = async (): Promise<void> => {
@@ -384,14 +328,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         try {
             await logoutApi();
         } finally {
-            try {
-                localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
-                localStorage.removeItem(STORAGE_KEY_PREFIX + "memberships");
-                localStorage.removeItem(STORAGE_KEY_PREFIX + "join_requests");
-                localStorage.removeItem(STORAGE_KEY_PREFIX + "notifications");
-            } catch {
-                // Ignore storage errors
-            }
             setCurrentUser(null);
             setMemberships([]);
             setJoinRequests([]);
