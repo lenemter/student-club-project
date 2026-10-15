@@ -9,7 +9,9 @@ import { mockNotifications as initialNotifications } from "../../entities/notifi
 import { StoreContext, type CreateClubDto, type UpdateProfileDto } from "./StoreContext";
 import {
     createClubApi,
+    createJoinRequestApi,
     deleteClubApi,
+    deleteJoinRequestApi,
     getAccessToken,
     getClubsApi,
     getCurrentUserApi,
@@ -20,7 +22,9 @@ import {
     loginApi,
     logoutApi,
     registerApi,
+    removeMemberApi,
     updateClubApi,
+    updateJoinRequestStatusApi,
 } from "../../shared/lib";
 
 const STORAGE_KEY_PREFIX = "student_clubs_";
@@ -322,44 +326,49 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setCurrentUser(initialCurrentUser);
     };
 
-    const requestToJoinClub = (clubId: number): void => {
+    const requestToJoinClub = async (clubId: number): Promise<void> => {
         const existing = joinRequests.find(
             (r) => r.clubId === clubId && r.userId === currentUser.id && r.status === "pending",
         );
         if (existing) return;
 
-        const newRequest: JoinRequest = {
-            id: Date.now(),
-            clubId,
-            userId: currentUser.id,
-            status: "pending",
-            createdAt: new Date().toISOString(),
-        };
-
-        setJoinRequests((prev) => [newRequest, ...prev]);
-
-        const club = getClubById(clubId);
-        if (club && club.leaderId !== currentUser.id) {
-            const notif: Notification = {
-                id: Date.now() + 1,
-                userId: club.leaderId,
-                title: "Новая заявка на вступление",
-                description: `${currentUser.firstName} ${currentUser.lastName} хочет вступить в «${club.name}»`,
-                createdAt: "Только что",
-                isRead: false,
-                type: "info",
+        try {
+            const newRequest = await createJoinRequestApi(clubId);
+            setJoinRequests((prev) => [newRequest, ...prev.filter((r) => r.id !== newRequest.id)]);
+        } catch {
+            const fallback: JoinRequest = {
+                id: Date.now(),
+                clubId,
+                userId: currentUser.id,
+                status: "pending",
+                createdAt: new Date().toISOString(),
             };
-            setNotifications((prev) => [notif, ...prev]);
+            setJoinRequests((prev) => [fallback, ...prev]);
         }
     };
 
-    const cancelJoinRequest = (clubId: number): void => {
+    const cancelJoinRequest = async (clubId: number): Promise<void> => {
+        const existing = joinRequests.find(
+            (r) => r.clubId === clubId && r.userId === currentUser.id && r.status === "pending",
+        );
+        if (existing) {
+            try {
+                await deleteJoinRequestApi(existing.id);
+            } catch {
+                // Ignore API error on cancel
+            }
+        }
         setJoinRequests((prev) =>
             prev.filter((r) => !(r.clubId === clubId && r.userId === currentUser.id && r.status === "pending")),
         );
     };
 
-    const leaveClub = (clubId: number): void => {
+    const leaveClub = async (clubId: number): Promise<void> => {
+        try {
+            await removeMemberApi(clubId, currentUser.id);
+        } catch {
+            // Ignore API error on leave
+        }
         setMemberships((prev) =>
             prev.filter((m) => !(m.clubId === clubId && m.userId === currentUser.id)),
         );
@@ -368,49 +377,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
     };
 
-    const approveJoinRequest = (requestId: number): void => {
+    const approveJoinRequest = async (requestId: number): Promise<void> => {
         const req = joinRequests.find((r) => r.id === requestId);
-        if (!req) return;
-
-        const newMembership: Membership = {
-            id: Date.now(),
-            clubId: req.clubId,
-            userId: req.userId,
-            joinedAt: new Date().toISOString(),
-        };
-
-        setMemberships((prev) => [...prev, newMembership]);
-        setJoinRequests((prev) => prev.filter((r) => r.id !== requestId));
-
-        const club = getClubById(req.clubId);
-        const notif: Notification = {
-            id: Date.now() + 2,
-            userId: req.userId,
-            title: "Заявка одобрена",
-            description: `Вы приняты в кружок «${club?.name ?? ""}»`,
-            createdAt: "Только что",
-            isRead: false,
-            type: "success",
-        };
-        setNotifications((prev) => [notif, ...prev]);
+        try {
+            await updateJoinRequestStatusApi(requestId, "approved");
+            if (req) {
+                const newMembership: Membership = {
+                    id: Date.now(),
+                    clubId: req.clubId,
+                    userId: req.userId,
+                    joinedAt: new Date().toISOString(),
+                };
+                setMemberships((prev) => [...prev, newMembership]);
+            }
+        } catch {
+            if (req) {
+                const newMembership: Membership = {
+                    id: Date.now(),
+                    clubId: req.clubId,
+                    userId: req.userId,
+                    joinedAt: new Date().toISOString(),
+                };
+                setMemberships((prev) => [...prev, newMembership]);
+            }
+        } finally {
+            setJoinRequests((prev) => prev.filter((r) => r.id !== requestId));
+        }
     };
 
-    const rejectJoinRequest = (requestId: number): void => {
-        const req = joinRequests.find((r) => r.id === requestId);
-        setJoinRequests((prev) => prev.filter((r) => r.id !== requestId));
-
-        if (req) {
-            const club = getClubById(req.clubId);
-            const notif: Notification = {
-                id: Date.now() + 3,
-                userId: req.userId,
-                title: "Заявка отклонена",
-                description: `Руководитель кружка «${club?.name ?? ""}» отклонил заявку`,
-                createdAt: "Только что",
-                isRead: false,
-                type: "warning",
-            };
-            setNotifications((prev) => [notif, ...prev]);
+    const rejectJoinRequest = async (requestId: number): Promise<void> => {
+        try {
+            await updateJoinRequestStatusApi(requestId, "rejected");
+        } catch {
+            // Ignore error
+        } finally {
+            setJoinRequests((prev) => prev.filter((r) => r.id !== requestId));
         }
     };
 

@@ -71,24 +71,24 @@ export function ClubPage() {
     const myRequestStatus = getUserRequestStatusForClub(club.id);
     const isLeader = club.leaderId === currentUser.id;
 
-    const handleJoin = () => {
-        requestToJoinClub(club.id);
+    const handleJoin = async () => {
+        await requestToJoinClub(club.id);
     };
 
-    const handleCancelRequest = () => {
-        cancelJoinRequest(club.id);
+    const handleCancelRequest = async () => {
+        await cancelJoinRequest(club.id);
     };
 
-    const handleLeave = () => {
-        leaveClub(club.id);
+    const handleLeave = async () => {
+        await leaveClub(club.id);
     };
 
-    const handleApproveRequest = (reqId: number) => {
-        approveJoinRequest(reqId);
+    const handleApproveRequest = async (reqId: number) => {
+        await approveJoinRequest(reqId);
     };
 
-    const handleRejectRequest = (reqId: number) => {
-        rejectJoinRequest(reqId);
+    const handleRejectRequest = async (reqId: number) => {
+        await rejectJoinRequest(reqId);
     };
 
     const handleSaveAttendance = () => {
