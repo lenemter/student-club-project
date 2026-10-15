@@ -99,7 +99,20 @@ export async function apiFetch<T = unknown>(
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const message = errorData.detail || `Ошибка запроса (код ${response.status})`;
+        let message = errorData.detail;
+        if (!message) {
+            if (response.status === 403) {
+                message = "У вас нет прав для выполнения этого действия";
+            } else if (response.status === 404) {
+                message = "Запрошенные данные не найдены";
+            } else if (response.status === 409) {
+                message = "Конфликт данных";
+            } else if (response.status === 422) {
+                message = "Некорректный формат переданных данных";
+            } else {
+                message = `Ошибка запроса (код ${response.status})`;
+            }
+        }
         throw new Error(typeof message === "string" ? message : JSON.stringify(message));
     }
 

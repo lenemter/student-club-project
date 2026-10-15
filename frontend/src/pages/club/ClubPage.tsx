@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Avatar, Button, Card, Typography } from "@heroui/react";
 import { Calendar, Check, Xmark } from "@gravity-ui/icons";
-import { HeaderBar, ErrorState, EmptyState } from "../../shared/ui";
+import { HeaderBar, ErrorState, EmptyState, LoadingState } from "../../shared/ui";
 import { AvatarGroup, MembersModal } from "../../entities/user";
 import { AttendanceModal } from "../../features/manage-attendance";
 import type { Club, User } from "../../shared/types";
@@ -33,6 +33,7 @@ export function ClubPage() {
         rejectJoinRequest,
         addAttendanceRecord,
         deleteClub,
+        isLoading,
     } = useStore();
 
     const club: Club | undefined = getClubById(clubId);
@@ -47,6 +48,14 @@ export function ClubPage() {
     const setMembersModalOpen = (open: boolean) => {
         setSearchParams(open ? { members: "1" } : {}, { replace: true });
     };
+
+    if (isLoading && (!club || !leader)) {
+        return (
+            <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center justify-center">
+                <LoadingState message="Загрузка кружка..." />
+            </main>
+        );
+    }
 
     if (!club || !leader) {
         return (

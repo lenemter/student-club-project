@@ -24,6 +24,7 @@ export interface StoreContextType {
     joinRequests: JoinRequest[];
     attendanceRecords: AttendanceRecord[];
     notifications: Notification[];
+    isLoading: boolean;
 
     // Selectors
     getUserById: (id: number) => User | undefined;

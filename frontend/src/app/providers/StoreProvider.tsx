@@ -67,6 +67,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const [notifications, setNotifications] = useState<Notification[]>(() =>
         loadFromStorage("notifications", initialNotifications),
     );
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // LocalStorage
     useEffect(() => saveToStorage("users", users), [users]);
@@ -127,7 +128,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             })
             .catch(() => {})
             .finally(() => {
-                refreshData();
+                refreshData().finally(() => {
+                    setIsLoading(false);
+                });
             });
     }, []);
 
@@ -469,6 +472,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 joinRequests,
                 attendanceRecords,
                 notifications,
+                isLoading,
                 getUserById,
                 getClubById,
                 getUserClubs,

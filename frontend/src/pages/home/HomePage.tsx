@@ -1,11 +1,19 @@
 import { Typography } from "@heroui/react";
 import { ClubCardGrid } from "../../entities/club";
-import { HeaderBar } from "../../shared/ui";
+import { HeaderBar, LoadingState } from "../../shared/ui";
 import { NewClubButton } from "../../features/create-club";
 import { useStore } from "../../app/providers/StoreContext";
 
 export function HomePage() {
-    const { currentUser, getUserClubs, getJoinableClubs } = useStore();
+    const { currentUser, getUserClubs, getJoinableClubs, isLoading } = useStore();
+
+    if (isLoading) {
+        return (
+            <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center justify-center">
+                <LoadingState message="Загрузка данных..." />
+            </main>
+        );
+    }
 
     const myClubs = getUserClubs(currentUser.id);
     const otherClubs = getJoinableClubs();

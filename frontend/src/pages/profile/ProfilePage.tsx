@@ -1,7 +1,7 @@
 import { Avatar, Button, Typography } from "@heroui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ClubCardGrid } from "../../entities/club";
-import { HeaderBar, ErrorState } from "../../shared/ui";
+import { HeaderBar, ErrorState, LoadingState } from "../../shared/ui";
 import { getUserAvatarFallback, getUserFullName } from "../../shared/lib/formatters";
 import type { User } from "../../shared/types";
 import { useStore } from "../../app/providers/StoreContext";
@@ -9,9 +9,17 @@ import { useStore } from "../../app/providers/StoreContext";
 export function ProfilePage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { currentUser, getUserById, getUserClubs } = useStore();
+    const { currentUser, getUserById, getUserClubs, isLoading } = useStore();
 
     const user: User | undefined = getUserById(Number(id));
+
+    if (isLoading && !user) {
+        return (
+            <main className="bg-background min-h-screen px-4 py-8 flex flex-col items-center justify-center">
+                <LoadingState message="Загрузка профиля..." />
+            </main>
+        );
+    }
 
     if (!user) {
         return (
