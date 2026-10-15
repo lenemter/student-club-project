@@ -3,7 +3,12 @@ from .attendance import (
     AttendanceRecordPublic,
     AttendanceRecordUpdate,
 )
-from .club import ClubCreate, ClubPublic, ClubUpdate
+from .club import (
+    ClubCreate,
+    ClubImageResponse,
+    ClubPublic,
+    ClubUpdate,
+)
 from .join_request import (
     JoinRequestCreate,
     JoinRequestPublic,
@@ -31,6 +36,7 @@ __all__ = [
     "ClubPublic",
     "ClubCreate",
     "ClubUpdate",
+    "ClubImageResponse",
     "MembershipPublic",
     "MembershipCreate",
     "JoinRequestPublic",

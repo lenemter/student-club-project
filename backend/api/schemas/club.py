@@ -34,3 +34,7 @@ class ClubUpdate(ClubBase):
     image_url: UnsetType | str = Unset
     schedule: UnsetType | str = Unset
     leader_id: UnsetType | int = Unset
+
+
+class ClubImageResponse(ClubBase):
+    image_url: str

@@ -63,11 +63,11 @@ async def get_club_members(club: api.dependencies.ClubDep):
     return api.db.get_club_members(club.id)
 
 
-@router.post("/upload-image", response_model=dict[str, str])
+@router.post("/upload-image", response_model=api.schemas.ClubImageResponse)
 async def upload_club_image(
     _: api.dependencies.CurrentUserDep,
     file: UploadFile = File(...),
-):
+) -> api.schemas.ClubImageResponse:
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if file.content_type not in allowed_types:
         raise HTTPException(
@@ -84,9 +84,8 @@ async def upload_club_image(
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # TODO: отдельная response model для image'ей
     image_url = f"/static/clubs/{filename}"
-    return {"imageUrl": image_url, "image_url": image_url}
+    return api.schemas.ClubImageResponse(image_url=image_url)
 
 
 @router.post("/{club_id}/image", response_model=api.schemas.ClubPublic)
