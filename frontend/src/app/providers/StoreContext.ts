@@ -38,8 +38,9 @@ export interface StoreContextType {
     // Actions (user scripts)
     createClub: (data: CreateClubDto) => Club;
     updateCurrentUser: (data: UpdateProfileDto) => void;
-    login: (email: string) => boolean;
-    signup: (user: Omit<User, "id">) => User;
+    login: (email: string, password?: string) => Promise<boolean> | boolean;
+    signup: (user: Omit<User, "id">, password?: string) => Promise<User> | User;
+    logout: () => Promise<void> | void;
     requestToJoinClub: (clubId: number) => void;
     cancelJoinRequest: (clubId: number) => void;
     leaveClub: (clubId: number) => void;

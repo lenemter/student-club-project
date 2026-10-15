@@ -63,22 +63,30 @@ export function SignUpForm() {
         return Object.keys(newErrors).length === 0;
     };
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         if (!validate()) {
             return;
         }
 
-        signup({
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            email: email.trim(),
-            aboutMe: "Студент",
-            avatarUrl: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/green.jpg",
-        });
+        try {
+            await signup(
+                {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    email: email.trim(),
+                    aboutMe: "Студент",
+                    avatarUrl: "https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/green.jpg",
+                },
+                password,
+            );
 
-        navigate("/");
+            navigate("/");
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Ошибка регистрации";
+            setErrors({ general: message });
+        }
     }
 
     return (

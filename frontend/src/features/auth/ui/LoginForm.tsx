@@ -32,20 +32,25 @@ export function LoginForm() {
         return Object.keys(newErrors).length === 0;
     };
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         if (!validate()) {
             return;
         }
 
-        const success = login(email);
-        if (success) {
-            navigate("/");
-        } else {
-            setErrors({
-                general: "Пользователь с таким email не найден. Зарегистрируйтесь или проверьте адрес.",
-            });
+        try {
+            const success = await login(email, password);
+            if (success) {
+                navigate("/");
+            } else {
+                setErrors({
+                    general: "Неверный email или пароль.",
+                });
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Ошибка входа";
+            setErrors({ general: message });
         }
     }
 

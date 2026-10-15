@@ -7,6 +7,7 @@ import { mockJoinRequests as initialJoinRequests } from "../../entities/join-req
 import { mockAttendance as initialAttendance } from "../../entities/attendance/model/mockAttendance";
 import { mockNotifications as initialNotifications } from "../../entities/notification/model/mockNotifications";
 import { StoreContext, type CreateClubDto, type UpdateProfileDto } from "./StoreContext";
+import { getCurrentUserApi, loginApi, logoutApi, registerApi } from "../../shared/lib";
 
 const STORAGE_KEY_PREFIX = "student_clubs_";
 
@@ -54,6 +55,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     useEffect(() => saveToStorage("join_requests", joinRequests), [joinRequests]);
     useEffect(() => saveToStorage("attendance", attendanceRecords), [attendanceRecords]);
     useEffect(() => saveToStorage("notifications", notifications), [notifications]);
+
+    // Restore authenticated session from backend if tokens exist
+    useEffect(() => {
+        getCurrentUserApi()
+            .then((user) => {
+                if (user) {
+                    setCurrentUser(user);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     // Selectors
     const getUserById = (id: number): User | undefined => {
@@ -156,7 +168,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
     };
 
-    const login = (email: string): boolean => {
+    const login = async (email: string, password?: string): Promise<boolean> => {
+        if (password) {
+            const user = await loginApi(email, password);
+            setCurrentUser(user);
+            setUsers((prev) =>
+                prev.some((u) => u.id === user.id) ? prev.map((u) => (u.id === user.id ? user : u)) : [...prev, user],
+            );
+            return true;
+        }
+
         const found = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
         if (found) {
             setCurrentUser(found);
@@ -165,7 +186,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return false;
     };
 
-    const signup = (userData: Omit<User, "id">): User => {
+    const signup = async (userData: Omit<User, "id">, password?: string): Promise<User> => {
+        if (password) {
+            const user = await registerApi({
+                email: userData.email,
+                password,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                aboutMe: userData.aboutMe,
+                avatarUrl: userData.avatarUrl,
+            });
+            setUsers((prev) =>
+                prev.some((u) => u.id === user.id) ? prev.map((u) => (u.id === user.id ? user : u)) : [...prev, user],
+            );
+            setCurrentUser(user);
+            return user;
+        }
+
         const newUser: User = {
             ...userData,
             id: Date.now(),
@@ -174,6 +211,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setUsers((prev) => [...prev, newUser]);
         setCurrentUser(newUser);
         return newUser;
+    };
+
+    const logout = async (): Promise<void> => {
+        await logoutApi();
+        localStorage.removeItem(STORAGE_KEY_PREFIX + "current_user");
+        setCurrentUser(initialCurrentUser);
     };
 
     const requestToJoinClub = (clubId: number): void => {
@@ -308,6 +351,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 updateCurrentUser,
                 login,
                 signup,
+                logout,
                 requestToJoinClub,
                 cancelJoinRequest,
                 leaveClub,

@@ -6,7 +6,7 @@ import { useStore } from "../../../app/providers/StoreContext";
 
 export function ProfileButton() {
     const navigate = useNavigate();
-    const { currentUser } = useStore();
+    const { currentUser, logout } = useStore();
 
     return (
         <Dropdown>
@@ -36,11 +36,14 @@ export function ProfileButton() {
                 </div>
 
                 <Dropdown.Menu
-                    onAction={(key) => {
+                    onAction={async (key) => {
                         if (key === "home") navigate("/");
                         if (key === "profile") navigate(`/profile/${currentUser.id}`);
                         if (key === "settings") navigate("/settings");
-                        if (key === "log-out") navigate("/login");
+                        if (key === "log-out") {
+                            await logout?.();
+                            navigate("/login");
+                        }
                     }}
                 >
                     <Dropdown.Section>
