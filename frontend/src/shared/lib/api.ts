@@ -1,4 +1,4 @@
-import type { User } from "../types";
+import type { AttendanceRecord, Club, JoinRequest, Membership, Notification, User } from "../types";
 
 const ACCESS_TOKEN_KEY = "student_clubs_access_token";
 const REFRESH_TOKEN_KEY = "student_clubs_refresh_token";
@@ -63,11 +63,14 @@ export async function apiFetch<T = unknown>(
     endpoint: string,
     options: RequestInit = {},
 ): Promise<T> {
-    const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+    const url = endpoint.startsWith("http")
+        ? endpoint
+        : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
     const token = getAccessToken();
 
+    const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
     const headers: Record<string, string> = {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(options.headers as Record<string, string> || {}),
     };
 
@@ -78,20 +81,25 @@ export async function apiFetch<T = unknown>(
     let response = await fetch(url, { ...options, headers });
 
     // Handle 401 Unauthorized by trying to refresh access token
-    if (response.status === 401 && getRefreshToken() && !endpoint.includes("/auth/refresh") && !endpoint.includes("/auth/login")) {
+    if (
+        response.status === 401 &&
+        getRefreshToken() &&
+        !endpoint.includes("/auth/refresh") &&
+        !endpoint.includes("/auth/login")
+    ) {
         try {
             const newToken = await refreshAccessToken();
             headers["Authorization"] = `Bearer ${newToken}`;
             response = await fetch(url, { ...options, headers });
         } catch {
             clearTokens();
-            throw new Error("Session expired. Please log in again.");
+            throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
         }
     }
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const message = errorData.detail || `Request failed with status ${response.status}`;
+        const message = errorData.detail || `Ошибка запроса (код ${response.status})`;
         throw new Error(typeof message === "string" ? message : JSON.stringify(message));
     }
 
@@ -190,3 +198,194 @@ export async function getCurrentUserApi(): Promise<User | null> {
         return null;
     }
 }
+
+// ==========================================
+// Clubs API
+// ==========================================
+export async function getClubsApi(): Promise<Club[]> {
+    return apiFetch<Club[]>("/clubs/");
+}
+
+export async function getMyClubsApi(): Promise<Club[]> {
+    return apiFetch<Club[]>("/clubs/my");
+}
+
+export async function getJoinableClubsApi(): Promise<Club[]> {
+    return apiFetch<Club[]>("/clubs/joinable");
+}
+
+export async function getClubByIdApi(id: number): Promise<Club> {
+    return apiFetch<Club>(`/clubs/${id}`);
+}
+
+export interface CreateClubApiDto {
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    schedule?: string;
+}
+
+export async function createClubApi(dto: CreateClubApiDto): Promise<Club> {
+    return apiFetch<Club>("/clubs/", {
+        method: "POST",
+        body: JSON.stringify(dto),
+    });
+}
+
+export async function updateClubApi(id: number, dto: Partial<CreateClubApiDto>): Promise<Club> {
+    return apiFetch<Club>(`/clubs/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(dto),
+    });
+}
+
+export async function deleteClubApi(id: number): Promise<void> {
+    return apiFetch<void>(`/clubs/${id}`, {
+        method: "DELETE",
+    });
+}
+
+export async function uploadClubImageApi(file: File): Promise<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiFetch<{ imageUrl: string }>("/clubs/upload-image", {
+        method: "POST",
+        body: formData,
+    });
+}
+
+export async function getClubMembersApi(clubId: number): Promise<User[]> {
+    return apiFetch<User[]>(`/clubs/${clubId}/members`);
+}
+
+// ==========================================
+// Memberships & Join Requests API
+// ==========================================
+export async function getClubMembershipsApi(clubId: number): Promise<Membership[]> {
+    return apiFetch<Membership[]>(`/clubs/${clubId}/memberships/`);
+}
+
+export async function getMyMembershipsApi(): Promise<Membership[]> {
+    return apiFetch<Membership[]>("/users/me/memberships");
+}
+
+export async function removeMemberApi(clubId: number, userId: number): Promise<void> {
+    return apiFetch<void>(`/clubs/${clubId}/members/${userId}`, {
+        method: "DELETE",
+    });
+}
+
+export async function getJoinRequestsApi(clubId?: number, statusFilter?: string): Promise<JoinRequest[]> {
+    const params = new URLSearchParams();
+    if (clubId !== undefined) params.append("club_id", String(clubId));
+    if (statusFilter) params.append("status_filter", statusFilter);
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+    return apiFetch<JoinRequest[]>(`/join-requests/${queryString}`);
+}
+
+export async function createJoinRequestApi(clubId: number): Promise<JoinRequest> {
+    return apiFetch<JoinRequest>("/join-requests/", {
+        method: "POST",
+        body: JSON.stringify({ club_id: clubId }),
+    });
+}
+
+export async function updateJoinRequestStatusApi(
+    requestId: number,
+    status: "approved" | "rejected",
+): Promise<JoinRequest> {
+    return apiFetch<JoinRequest>(`/join-requests/${requestId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+    });
+}
+
+export async function deleteJoinRequestApi(requestId: number): Promise<void> {
+    return apiFetch<void>(`/join-requests/${requestId}`, {
+        method: "DELETE",
+    });
+}
+
+// ==========================================
+// Attendance API
+// ==========================================
+export async function getClubAttendanceApi(clubId: number): Promise<AttendanceRecord[]> {
+    return apiFetch<AttendanceRecord[]>(`/clubs/${clubId}/attendance/`);
+}
+
+export async function createAttendanceRecordApi(
+    clubId: number,
+    attendedUserIds: number[],
+    date?: string,
+): Promise<AttendanceRecord> {
+    return apiFetch<AttendanceRecord>(`/clubs/${clubId}/attendance/`, {
+        method: "POST",
+        body: JSON.stringify({
+            club_id: clubId,
+            date: date || new Date().toISOString(),
+            attended_user_ids: attendedUserIds,
+        }),
+    });
+}
+
+export async function deleteAttendanceRecordApi(recordId: number): Promise<void> {
+    return apiFetch<void>(`/attendance/${recordId}`, {
+        method: "DELETE",
+    });
+}
+
+// ==========================================
+// Users & Profile API
+// ==========================================
+export interface UpdateProfileApiDto {
+    firstName?: string;
+    lastName?: string;
+    aboutMe?: string;
+    avatarUrl?: string;
+    password?: string;
+}
+
+export async function updateProfileApi(dto: UpdateProfileApiDto): Promise<User> {
+    return apiFetch<User>("/users/me", {
+        method: "PATCH",
+        body: JSON.stringify(dto),
+    });
+}
+
+export async function uploadAvatarApi(file: File): Promise<User> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiFetch<User>("/users/me/avatar", {
+        method: "POST",
+        body: formData,
+    });
+}
+
+export async function getUsersApi(): Promise<User[]> {
+    return apiFetch<User[]>("/users/");
+}
+
+export async function getUserByIdApi(userId: number): Promise<User> {
+    return apiFetch<User>(`/users/${userId}`);
+}
+
+// ==========================================
+// Notifications API
+// ==========================================
+export async function getNotificationsApi(): Promise<Notification[]> {
+    return apiFetch<Notification[]>("/notifications/");
+}
+
+export async function markNotificationReadApi(notificationId: number): Promise<Notification> {
+    return apiFetch<Notification>(`/notifications/${notificationId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_read: true }),
+    });
+}
+
+export async function deleteNotificationApi(notificationId: number): Promise<void> {
+    return apiFetch<void>(`/notifications/${notificationId}`, {
+        method: "DELETE",
+    });
+}
+
