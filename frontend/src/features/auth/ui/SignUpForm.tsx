@@ -23,6 +23,9 @@ export function SignUpForm() {
         general?: string;
     }>({});
 
+    const isInvalidEmailFormat = email.trim().length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const emailErrorMessage = errors.email || (isInvalidEmailFormat ? "Некорректный формат email (например, name@example.com)" : undefined);
+
     const validate = (): boolean => {
         const newErrors: typeof errors = {};
 
@@ -140,7 +143,7 @@ export function SignUpForm() {
                 type="email"
                 autoComplete="email"
                 value={email}
-                isInvalid={Boolean(errors.email)}
+                isInvalid={Boolean(emailErrorMessage)}
                 onChange={(val) => {
                     setEmail(val);
                     if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
@@ -148,7 +151,7 @@ export function SignUpForm() {
             >
                 <Label>Email</Label>
                 <Input placeholder="example@example.com" />
-                {errors.email ? <FieldError>{errors.email}</FieldError> : <FieldError />}
+                {emailErrorMessage ? <FieldError>{emailErrorMessage}</FieldError> : <FieldError />}
             </TextField>
 
             <PasswordField
