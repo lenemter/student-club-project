@@ -110,8 +110,11 @@ export async function loginApi(email: string, password: string): Promise<User> {
     });
 
     if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error("Неверный email или пароль");
+        }
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.detail || "Неверный email или пароль");
+        throw new Error(errData.detail || "Произошла ошибка при входе");
     }
 
     const tokenData: TokenResponse = await response.json();
@@ -142,8 +145,11 @@ export async function registerApi(dto: RegisterDto): Promise<User> {
     });
 
     if (!response.ok) {
+        if (response.status === 409) {
+            throw new Error("Пользователь с таким email уже зарегистрирован");
+        }
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.detail || "Ошибка регистрации");
+        throw new Error(errData.detail || "Произошла ошибка при регистрации");
     }
 
     const tokenData: TokenResponse = await response.json();
