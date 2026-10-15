@@ -2,7 +2,7 @@ import { Avatar, Button, Typography } from "@heroui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ClubCardGrid } from "../../entities/club";
 import { HeaderBar, ErrorState, LoadingState } from "../../shared/ui";
-import { getUserAvatarFallback, getUserFullName } from "../../shared/lib/formatters";
+import { getUserAvatarFallback, getUserFullName, resolveImageUrl } from "../../shared/lib/formatters";
 import type { User } from "../../shared/types";
 import { useStore } from "../../app/providers/StoreContext";
 
@@ -50,7 +50,7 @@ export function ProfilePage() {
 
                 <div className="w-full flex items-center gap-4">
                     <Avatar size="lg" className="size-24 sm:size-36 lg:size-48 rounded-full shrink-0">
-                        <Avatar.Image alt={getUserFullName(user)} src={user.avatarUrl} />
+                        <Avatar.Image alt={getUserFullName(user)} src={resolveImageUrl(user.avatarUrl)} />
                         <Avatar.Fallback>{getUserAvatarFallback(user)}</Avatar.Fallback>
                     </Avatar>
                     <div className="flex flex-col gap-2 min-w-0">

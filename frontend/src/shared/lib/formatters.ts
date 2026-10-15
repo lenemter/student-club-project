@@ -25,3 +25,22 @@ export function getMemberCountText(n: number): string {
 
     return `${n} участников`;
 }
+
+export function resolveImageUrl(url?: string | null): string {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:") || url.startsWith("data:")) {
+        return url;
+    }
+    const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (apiUrl && apiUrl.startsWith("http")) {
+        try {
+            const origin = new URL(apiUrl).origin;
+            return `${origin}${cleanUrl}`;
+        } catch {
+            // fallback to relative
+        }
+    }
+    return cleanUrl;
+}
+

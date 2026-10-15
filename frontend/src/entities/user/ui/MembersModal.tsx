@@ -1,7 +1,7 @@
 import { Avatar, Modal } from "@heroui/react";
 import { Link } from "react-router-dom";
 import type { User } from "../../../shared/types";
-import { getMemberCountText, getUserAvatarFallback, getUserFullName } from "../../../shared/lib/formatters";
+import { getMemberCountText, getUserAvatarFallback, getUserFullName, resolveImageUrl } from "../../../shared/lib/formatters";
 
 export interface MembersModalProps {
     isOpen: boolean;
@@ -29,7 +29,7 @@ export function MembersModal({ isOpen, onOpenChange, members, leaderId }: Member
                                         className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-surface"
                                     >
                                         <Avatar>
-                                            <Avatar.Image alt={getUserFullName(m)} src={m.avatarUrl} />
+                                            <Avatar.Image alt={getUserFullName(m)} src={resolveImageUrl(m.avatarUrl)} />
                                             <Avatar.Fallback>{getUserAvatarFallback(m)}</Avatar.Fallback>
                                         </Avatar>
                                         <div className="flex flex-col min-w-0">

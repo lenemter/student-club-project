@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Card, FieldError, Form, Input, Label, TextArea, TextField, Typography } from "@heroui/react";
 import { TrashBin } from "@gravity-ui/icons";
 import { useStore } from "../../../app/providers/StoreContext";
-import { uploadAvatarApi } from "../../../shared/lib";
+import { uploadAvatarApi, resolveImageUrl } from "../../../shared/lib";
 
 const ABOUT_ME_MAX_LENGTH = 200;
 
@@ -106,7 +106,7 @@ export function EditProfileForm() {
 
                     <div className="flex items-center gap-5">
                         <Avatar className="size-20 sm:size-24 rounded-full shrink-0">
-                            <Avatar.Image alt={`${firstName} ${lastName}`} src={avatarUrl} />
+                            <Avatar.Image alt={`${firstName} ${lastName}`} src={resolveImageUrl(avatarUrl)} />
                             <Avatar.Fallback className="text-xl">{avatarFallback}</Avatar.Fallback>
                         </Avatar>
 

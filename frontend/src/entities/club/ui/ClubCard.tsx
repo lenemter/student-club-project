@@ -1,7 +1,7 @@
 import { Avatar, Button, Card } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import type { Club, User } from "../../../shared/types";
-import { getMemberCountText, getUserAvatarFallback, getUserFullName } from "../../../shared/lib/formatters";
+import { getMemberCountText, getUserAvatarFallback, getUserFullName, resolveImageUrl } from "../../../shared/lib/formatters";
 import { fallbackUser } from "../../user";
 import { useStore } from "../../../app/providers/StoreContext";
 
@@ -27,7 +27,7 @@ export function ClubCard({ club }: ClubCardProps) {
                     alt={club.name}
                     className="pointer-events-none aspect-square w-14 rounded-2xl object-cover select-none"
                     loading="lazy"
-                    src={club.imageUrl}
+                    src={resolveImageUrl(club.imageUrl)}
                 />
 
                 <Card.Header>
@@ -37,7 +37,7 @@ export function ClubCard({ club }: ClubCardProps) {
 
                 <Card.Footer className="flex gap-2">
                     <Avatar className="size-5">
-                        <Avatar.Image alt={getUserFullName(leader)} src={leader.avatarUrl} />
+                        <Avatar.Image alt={getUserFullName(leader)} src={resolveImageUrl(leader.avatarUrl)} />
                         <Avatar.Fallback className="text-xs">{getUserAvatarFallback(leader)}</Avatar.Fallback>
                     </Avatar>
                     <span className="text-xs">{getUserFullName(leader)}</span>

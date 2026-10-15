@@ -10,6 +10,7 @@ import {
     getMemberCountText,
     getUserAvatarFallback,
     getUserFullName,
+    resolveImageUrl,
 } from "../../shared/lib/formatters";
 import { useStore } from "../../app/providers/StoreContext";
 
@@ -135,7 +136,7 @@ export function ClubPage() {
                     <div className="flex flex-col gap-6 min-w-0">
                         <div className="flex items-center gap-5">
                             <Avatar className="size-24 sm:size-32 shrink-0 rounded-3xl">
-                                <Avatar.Image alt={club.name} src={club.imageUrl} />
+                                <Avatar.Image alt={club.name} src={resolveImageUrl(club.imageUrl)} />
                                 <Avatar.Fallback>{club.name.slice(0, 1)}</Avatar.Fallback>
                             </Avatar>
 
@@ -177,7 +178,7 @@ export function ClubPage() {
                                                     className="flex items-center gap-2 text-sm font-medium hover:underline"
                                                 >
                                                     <Avatar size="sm">
-                                                        <Avatar.Image src={reqUser.avatarUrl} />
+                                                        <Avatar.Image src={resolveImageUrl(reqUser.avatarUrl)} />
                                                         <Avatar.Fallback>
                                                             {getUserAvatarFallback(reqUser)}
                                                         </Avatar.Fallback>
@@ -320,7 +321,7 @@ export function ClubPage() {
                                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                             >
                                 <Avatar className="size-10">
-                                    <Avatar.Image alt={getUserFullName(leader)} src={leader.avatarUrl} />
+                                    <Avatar.Image alt={getUserFullName(leader)} src={resolveImageUrl(leader.avatarUrl)} />
                                     <Avatar.Fallback className="text-xs">
                                         {getUserAvatarFallback(leader)}
                                     </Avatar.Fallback>
