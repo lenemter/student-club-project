@@ -2,7 +2,7 @@ import { Avatar, Button, Card } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import type { Club, User } from "../../../shared/types";
 import { getMemberCountText, getUserAvatarFallback, getUserFullName } from "../../../shared/lib/formatters";
-import { fallbackUser } from "../../user/model/mockUsers";
+import { fallbackUser } from "../../user";
 import { useStore } from "../../../app/providers/StoreContext";
 
 export interface ClubCardProps {

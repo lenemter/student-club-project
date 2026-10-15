@@ -1,8 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { User, Club, Membership, JoinRequest, Notification, AttendanceRecord } from "../../shared/types";
-import { mockUsers as initialUsers } from "../../entities/user/model/mockUsers";
-import { mockClubs as initialClubs } from "../../entities/club/model/mockClubs";
-import { mockAttendance as initialAttendance } from "../../entities/attendance/model/mockAttendance";
 import { StoreContext, type CreateClubDto, type UpdateProfileDto } from "./StoreContext";
 import {
     createAttendanceRecordApi,
@@ -47,7 +44,7 @@ function saveToStorage<T>(key: string, value: T): void {
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-    const [users, setUsers] = useState<User[]>(() => loadFromStorage("users", initialUsers));
+    const [users, setUsers] = useState<User[]>(() => loadFromStorage("users", []));
     const [currentUser, setCurrentUser] = useState<User | null>(() => {
         if (!getAccessToken()) {
             try {
@@ -59,7 +56,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
         return loadFromStorage<User | null>("current_user", null);
     });
-    const [clubs, setClubs] = useState<Club[]>(() => loadFromStorage("clubs", initialClubs));
+    const [clubs, setClubs] = useState<Club[]>(() => loadFromStorage("clubs", []));
     const [memberships, setMemberships] = useState<Membership[]>(() =>
         getAccessToken() ? loadFromStorage("memberships", []) : [],
     );
@@ -67,7 +64,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         getAccessToken() ? loadFromStorage("join_requests", []) : [],
     );
     const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(() =>
-        loadFromStorage("attendance", initialAttendance),
+        loadFromStorage("attendance", []),
     );
     const [notifications, setNotifications] = useState<Notification[]>(() =>
         getAccessToken() ? loadFromStorage("notifications", []) : [],
