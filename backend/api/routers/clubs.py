@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import Annotated
 import uuid
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
@@ -66,7 +67,7 @@ async def get_club_members(club: api.dependencies.ClubDep):
 @router.post("/upload-image", response_model=api.schemas.ClubImageResponse)
 async def upload_club_image(
     _: api.dependencies.CurrentUserDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ) -> api.schemas.ClubImageResponse:
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if file.content_type not in allowed_types:
@@ -92,7 +93,7 @@ async def upload_club_image(
 async def upload_existing_club_image(
     club: api.dependencies.ClubLeaderAccessDep,
     session: api.dependencies.SessionDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ):
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if file.content_type not in allowed_types:

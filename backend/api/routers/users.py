@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import Annotated
 import uuid
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
@@ -41,7 +42,7 @@ async def edit_user_me(
 async def upload_user_avatar(
     current_user: api.dependencies.CurrentUserDep,
     session: api.dependencies.SessionDep,
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ):
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if file.content_type not in allowed_types:
