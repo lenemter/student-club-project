@@ -274,12 +274,45 @@ export async function getClubMembersApi(clubId: number): Promise<User[]> {
 // ==========================================
 // Memberships & Join Requests API
 // ==========================================
+interface RawMembership {
+    id: number;
+    clubId?: number;
+    club_id?: number;
+    userId?: number;
+    user_id?: number;
+    joinedAt?: string;
+    joined_at?: string;
+}
+
+interface RawJoinRequest {
+    id: number;
+    clubId?: number;
+    club_id?: number;
+    userId?: number;
+    user_id?: number;
+    status: "pending" | "approved" | "rejected";
+    createdAt?: string;
+    created_at?: string;
+}
+
 export async function getClubMembershipsApi(clubId: number): Promise<Membership[]> {
-    return apiFetch<Membership[]>(`/clubs/${clubId}/memberships/`);
+    const list = await apiFetch<RawMembership[]>(`/clubs/${clubId}/memberships/`);
+    return (list || []).map((raw) => ({
+        id: raw.id,
+        clubId: (raw.clubId ?? raw.club_id) || 0,
+        userId: (raw.userId ?? raw.user_id) || 0,
+        joinedAt: raw.joinedAt ?? raw.joined_at ?? "",
+    }));
 }
 
 export async function getMyMembershipsApi(): Promise<Membership[]> {
-    return apiFetch<Membership[]>("/users/me/memberships");
+    const list = await apiFetch<RawMembership[]>("/users/me/memberships");
+    return (list || []).map((raw) => ({
+        id: raw.id,
+        clubId: (raw.clubId ?? raw.club_id) || 0,
+        userId: (raw.userId ?? raw.user_id) || 0,
+        joinedAt: raw.joinedAt ?? raw.joined_at ?? "",
+    }));
 }
 
 export async function removeMemberApi(clubId: number, userId: number): Promise<void> {
@@ -293,24 +326,45 @@ export async function getJoinRequestsApi(clubId?: number, statusFilter?: string)
     if (clubId !== undefined) params.append("club_id", String(clubId));
     if (statusFilter) params.append("status_filter", statusFilter);
     const queryString = params.toString() ? `?${params.toString()}` : "";
-    return apiFetch<JoinRequest[]>(`/join-requests/${queryString}`);
+    const list = await apiFetch<RawJoinRequest[]>(`/join-requests/${queryString}`);
+    return (list || []).map((raw) => ({
+        id: raw.id,
+        clubId: (raw.clubId ?? raw.club_id) || 0,
+        userId: (raw.userId ?? raw.user_id) || 0,
+        status: raw.status,
+        createdAt: raw.createdAt ?? raw.created_at ?? "",
+    }));
 }
 
 export async function createJoinRequestApi(clubId: number): Promise<JoinRequest> {
-    return apiFetch<JoinRequest>("/join-requests/", {
+    const raw = await apiFetch<RawJoinRequest>("/join-requests/", {
         method: "POST",
-        body: JSON.stringify({ club_id: clubId }),
+        body: JSON.stringify({ club_id: clubId, clubId }),
     });
+    return {
+        id: raw.id,
+        clubId: (raw.clubId ?? raw.club_id) || 0,
+        userId: (raw.userId ?? raw.user_id) || 0,
+        status: raw.status,
+        createdAt: raw.createdAt ?? raw.created_at ?? "",
+    };
 }
 
 export async function updateJoinRequestStatusApi(
     requestId: number,
     status: "approved" | "rejected",
 ): Promise<JoinRequest> {
-    return apiFetch<JoinRequest>(`/join-requests/${requestId}`, {
+    const raw = await apiFetch<RawJoinRequest>(`/join-requests/${requestId}`, {
         method: "PATCH",
         body: JSON.stringify({ status }),
     });
+    return {
+        id: raw.id,
+        clubId: (raw.clubId ?? raw.club_id) || 0,
+        userId: (raw.userId ?? raw.user_id) || 0,
+        status: raw.status,
+        createdAt: raw.createdAt ?? raw.created_at ?? "",
+    };
 }
 
 export async function deleteJoinRequestApi(requestId: number): Promise<void> {

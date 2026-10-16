@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlmodel import Session, select
 
@@ -42,9 +42,11 @@ def create_attendance(
     club_id: int, date: datetime | None, attended_user_ids: list[int]
 ) -> tuple[AttendanceRecord, list[int]]:
     with Session(engine, expire_on_commit=False) as session:
+        if date is not None and date.tzinfo is None:
+            date = date.replace(tzinfo=timezone.utc)
         record = AttendanceRecord(
             club_id=club_id,
-            date=date if date is not None else datetime.utcnow(),
+            date=date if date is not None else datetime.now(timezone.utc),
         )
         session.add(record)
         session.commit()
@@ -69,6 +71,8 @@ def update_attendance(
     assert record.id is not None
 
     if date is not None:
+        if date.tzinfo is None:
+            date = date.replace(tzinfo=timezone.utc)
         record.date = date
         session.add(record)
 

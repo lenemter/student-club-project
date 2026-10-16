@@ -1,5 +1,5 @@
 """Seed script to populate initial mock data into the database."""
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import sys
 
@@ -152,7 +152,7 @@ def seed():
             {"club_id": 1, "attended_user_ids": [2, 1, 4]},
         ]
         for item in attendance_records:
-            rec = db.AttendanceRecord(club_id=item["club_id"], date=datetime.utcnow())
+            rec = db.AttendanceRecord(club_id=item["club_id"], date=datetime.now(timezone.utc))
             session.add(rec)
             session.commit()
             session.refresh(rec)

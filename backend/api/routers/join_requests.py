@@ -24,8 +24,20 @@ async def get_join_requests(
             )
         return api.db.get_join_requests(club_id=club_id, status=status_filter)
 
-    # If no club_id provided, return current user's requests
-    return api.db.get_join_requests(user_id=current_user.id, status=status_filter)
+    # If no club_id provided, return current user's requests and requests for clubs led by user
+    my_requests = api.db.get_join_requests(user_id=current_user.id, status=status_filter)
+    all_clubs = api.db.get_all_clubs()
+    lead_club_ids = [c.id for c in all_clubs if c.leader_id == current_user.id and c.id is not None]
+
+    seen_ids = {r.id for r in my_requests}
+    for c_id in lead_club_ids:
+        club_reqs = api.db.get_join_requests(club_id=c_id, status=status_filter)
+        for r in club_reqs:
+            if r.id not in seen_ids:
+                my_requests.append(r)
+                seen_ids.add(r.id)
+
+    return my_requests
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api.schemas.JoinRequestPublic)
